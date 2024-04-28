@@ -4,57 +4,57 @@ alter session
     set
     "_ORACLE_SCRIPT" = true;
 
-CREATE USER "AMAZONDATABSE" IDENTIFIED BY "MDPAMAZONDATABSE";
+CREATE USER "AMAZONDATABASE" IDENTIFIED BY "MDPAMAZONDATABASE";
 
-ALTER USER "AMAZONDATABSE" DEFAULT TABLESPACE "USERS" TEMPORARY TABLESPACE "TEMP" ACCOUNT UNLOCK;
+ALTER USER "AMAZONDATABASE" DEFAULT TABLESPACE "USERS" TEMPORARY TABLESPACE "TEMP" ACCOUNT UNLOCK;
 
 -- SYSTEM PRIVILEGES
-GRANT CREATE TRIGGER TO "AMAZONDATABSE";
+GRANT CREATE TRIGGER TO "AMAZONDATABASE";
 
-GRANT CREATE PROCEDURE TO  "AMAZONDATABSE";
+GRANT CREATE PROCEDURE TO  "AMAZONDATABASE";
 
-GRANT CREATE ANY INDEX TO "AMAZONDATABSE";
+GRANT CREATE ANY INDEX TO "AMAZONDATABASE";
 
-GRANT CREATE VIEW TO "AMAZONDATABSE";
+GRANT CREATE VIEW TO "AMAZONDATABASE";
 
-GRANT CREATE SESSION TO "AMAZONDATABSE";
+GRANT CREATE SESSION TO "AMAZONDATABASE";
 
 GRANT
     SELECT
-    ANY TABLE TO "AMAZONDATABSE";
+    ANY TABLE TO "AMAZONDATABASE";
 
-GRANT DELETE ANY TABLE TO "AMAZONDATABSE";
+GRANT DELETE ANY TABLE TO "AMAZONDATABASE";
 
-GRANT CREATE TABLE TO "AMAZONDATABSE";
+GRANT CREATE TABLE TO "AMAZONDATABASE";
 
-GRANT DROP ANY TABLE TO "AMAZONDATABSE";
+GRANT DROP ANY TABLE TO "AMAZONDATABASE";
 
-GRANT UNDER ANY TYPE TO "AMAZONDATABSE";
+GRANT UNDER ANY TYPE TO "AMAZONDATABASE";
 
-GRANT CREATE TYPE TO "AMAZONDATABSE";
+GRANT CREATE TYPE TO "AMAZONDATABASE";
 
-GRANT DROP ANY TYPE TO "AMAZONDATABSE";
+GRANT DROP ANY TYPE TO "AMAZONDATABASE";
 
-GRANT EXECUTE ANY PROCEDURE TO "AMAZONDATABSE";
+GRANT EXECUTE ANY PROCEDURE TO "AMAZONDATABASE";
 
 SET SERVEROUTPUT ON;
-GRANT UNLIMITED TABLESPACE TO "AMAZONDATABSE";
+GRANT UNLIMITED TABLESPACE TO "AMAZONDATABASE";
 
-GRANT EXECUTE ANY PROGRAM TO "AMAZONDATABSE";
+GRANT EXECUTE ANY PROGRAM TO "AMAZONDATABASE";
 
-GRANT EXECUTE ANY TYPE TO "AMAZONDATABSE";
+GRANT EXECUTE ANY TYPE TO "AMAZONDATABASE";
 
-GRANT DROP ANY INDEX TO "AMAZONDATABSE";
+GRANT DROP ANY INDEX TO "AMAZONDATABASE";
 
 GRANT
     UPDATE
-    ANY TABLE TO "AMAZONDATABSE";
+    ANY TABLE TO "AMAZONDATABASE";
 
-GRANT DROP ANY VIEW TO "AMAZONDATABSE";
+GRANT DROP ANY VIEW TO "AMAZONDATABASE";
 
-GRANT UNDER ANY VIEW TO "AMAZONDATABSE";
+GRANT UNDER ANY VIEW TO "AMAZONDATABASE";
 
-GRANT GRANT ANY PRIVILEGE TO "AMAZONDATABSE"; -- Crée la base de données AMAZON_DATABSE et ce connecter avec l'user configurer juste au dessus
+GRANT GRANT ANY PRIVILEGE TO "AMAZONDATABASE"; -- Crée la base de données AMAZON_DATABSE et ce connecter avec l'user configurer juste au dessus
 */
 
 -- Drop toutes les tables
@@ -69,7 +69,7 @@ END;
 
 -- Créé la table UTILISATEUR
 
-CREATE TABLE "AMAZONDATABSE"."UTILISATEUR"
+CREATE TABLE "AMAZONDATABASE"."UTILISATEUR"
 (
     "UTILISATEUR_UID" VARCHAR2(200 BYTE) NOT NULL ENABLE,
 	"UTILISATEUR_ID" NUMBER NOT NULL ENABLE,
@@ -182,9 +182,9 @@ CREATE TABLE ARTICLE
   ENABLE
 );
 
-CREATE TABLE CATEGORIE
+CREATE TABLE CATEGORIESS
 (
-  CATEGORIE_ID VARCHAR2(255) NOT NULL
+  CATEGORIESS_ID VARCHAR2(255) NOT NULL
 , CATEGORIE_UID VARCHAR2(255) NOT NULL
 , CATEGORIE_NOM VARCHAR2(255) NOT NULL
 , CATEGORIE_DESCRIPTION CLOB NOT NULL
@@ -249,7 +249,158 @@ CREATE TABLE ARTICLE_CATEGORIE
 );
 
 
+-- Getter Categorie
+CREATE OR REPLACE PROCEDURE get_categorie (
+    p_categorie_id IN VARCHAR2,
+    p_categorie_uid OUT VARCHAR2,
+    p_categorie_nom OUT VARCHAR2,
+    p_categorie_description OUT CLOB
+) AS
+BEGIN
+    SELECT CATEGORIE_UID, CATEGORIE_NOM, CATEGORIE_DESCRIPTION
+    INTO p_categorie_uid, p_categorie_nom, p_categorie_description
+    FROM CATEGORIE
+    WHERE CATEGORIE_ID = p_categorie_id;
+END get_categorie;
+/
 
+-- Setter Categorie
+CREATE OR REPLACE PROCEDURE set_categorie (
+    p_categorie_id IN VARCHAR2,
+    p_categorie_uid IN VARCHAR2,
+    p_categorie_nom IN VARCHAR2,
+    p_categorie_description IN CLOB
+) AS
+BEGIN
+    UPDATE CATEGORIE
+    SET CATEGORIE_UID = p_categorie_uid,
+        CATEGORIE_NOM = p_categorie_nom,
+        CATEGORIE_DESCRIPTION = p_categorie_description
+    WHERE CATEGORIE_ID = p_categorie_id;
+END set_categorie;
+/
 
+-- Getter Article_Categorie
+CREATE OR REPLACE PROCEDURE get_article_categorie (
+    p_article_categorie_uid IN VARCHAR2,
+    p_article_categorie_id OUT VARCHAR2,
+    p_article_categorie_article_uid OUT VARCHAR2,
+    p_article_categorie_categorie_uid OUT VARCHAR2
+) AS
+BEGIN
+    SELECT ARTICLE_CATEGORIE_ID, ARTICLE_CATEGORIE_ARTICLE_UID, ARTICLE_CATEGORIE_CATEGORIE_UID
+    INTO p_article_categorie_id, p_article_categorie_article_uid, p_article_categorie_categorie_uid
+    FROM ARTICLE_CATEGORIE
+    WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
+END get_article_categorie;
+/
 
+-- Setter Article_Categorie
+CREATE OR REPLACE PROCEDURE set_article_categorie (
+    p_article_categorie_uid IN VARCHAR2,
+    p_article_categorie_id IN VARCHAR2,
+    p_article_categorie_article_uid IN VARCHAR2,
+    p_article_categorie_categorie_uid IN VARCHAR2
+) AS
+BEGIN
+    UPDATE ARTICLE_CATEGORIE
+    SET ARTICLE_CATEGORIE_ID = p_article_categorie_id,
+        ARTICLE_CATEGORIE_ARTICLE_UID = p_article_categorie_article_uid,
+        ARTICLE_CATEGORIE_CATEGORIE_UID = p_article_categorie_categorie_uid
+    WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
+END set_article_categorie;
+/
 
+-- Getter Article
+CREATE OR REPLACE PROCEDURE get_article (
+    p_article_uid IN VARCHAR2,
+    p_article_id OUT VARCHAR2,
+    p_article_nom OUT VARCHAR2,
+    p_article_description OUT VARCHAR2,
+    p_article_prix OUT NUMBER,
+    p_article_photo OUT VARCHAR2,
+    p_article_note OUT NUMBER,
+    p_article_date_creation OUT DATE,
+    p_article_date_suppression OUT DATE
+) AS
+BEGIN
+    SELECT ARTICLE_ID, ARTICLE_NOM, ARTICLE_DESCRIPTION, ARTICLE_PRIX,
+           ARTICLE_PHOTO, ARTICLE_NOTE, ARTICLE_DATE_CREATION, ARTICLE_DATE_SUPPRESSION
+    INTO p_article_id, p_article_nom, p_article_description, p_article_prix,
+         p_article_photo, p_article_note, p_article_date_creation, p_article_date_suppression
+    FROM ARTICLE
+    WHERE ARTICLE_UID = p_article_uid;
+END get_article;
+/
+
+--  Setter Article
+CREATE OR REPLACE PROCEDURE set_article (
+    p_article_uid IN VARCHAR2,
+    p_article_id IN VARCHAR2,
+    p_article_nom IN VARCHAR2,
+    p_article_description IN VARCHAR2,
+    p_article_prix IN NUMBER,
+    p_article_photo IN VARCHAR2,
+    p_article_note IN NUMBER,
+    p_article_date_creation IN DATE,
+    p_article_date_suppression IN DATE
+) AS
+BEGIN
+    UPDATE ARTICLE
+    SET ARTICLE_ID = p_article_id,
+        ARTICLE_NOM = p_article_nom,
+        ARTICLE_DESCRIPTION = p_article_description,
+        ARTICLE_PRIX = p_article_prix,
+        ARTICLE_PHOTO = p_article_photo,
+        ARTICLE_NOTE = p_article_note,
+        ARTICLE_DATE_CREATION = p_article_date_creation,
+        ARTICLE_DATE_SUPPRESSION = p_article_date_suppression
+    WHERE ARTICLE_UID = p_article_uid;
+END set_article;
+/
+
+--  Getter Souhait
+CREATE OR REPLACE PROCEDURE get_souhait (
+    p_souhait_uid IN VARCHAR2,
+    p_souhait_id OUT VARCHAR2,
+    p_utilisateur_uid OUT VARCHAR2,
+    p_date_ajout OUT DATE,
+    p_date_suppression OUT DATE,
+    p_commande_uid OUT VARCHAR2,
+    p_article_uid OUT VARCHAR2,
+    p_quantite OUT VARCHAR2
+) AS
+BEGIN
+    SELECT SOUHAITS_ID, SOUHAITS_UTILISATEUR_UID, SOUHAITS_DATE_AJOUT,
+           SOUHAITS_DATE_SUPPRESSION, SOUHAITS_COMMANDE_UID, SOUHAITS_ARTICLE_UID,
+           SOUHAITS_QUANTITÉ
+    INTO p_souhait_id, p_utilisateur_uid, p_date_ajout, p_date_suppression,
+         p_commande_uid, p_article_uid, p_quantite
+    FROM SOUHAITS
+    WHERE SOUHAITS_UID = p_souhait_uid;
+END get_souhait;
+/
+
+-- Setter Souhait
+CREATE OR REPLACE PROCEDURE set_souhait (
+    p_souhait_uid IN VARCHAR2,
+    p_souhait_id IN VARCHAR2,
+    p_utilisateur_uid IN VARCHAR2,
+    p_date_ajout IN DATE,
+    p_date_suppression IN DATE,
+    p_commande_uid IN VARCHAR2,
+    p_article_uid IN VARCHAR2,
+    p_quantite IN VARCHAR2
+) AS
+BEGIN
+    UPDATE SOUHAITS
+    SET SOUHAITS_ID = p_souhait_id,
+        SOUHAITS_UTILISATEUR_UID = p_utilisateur_uid,
+        SOUHAITS_DATE_AJOUT = p_date_ajout,
+        SOUHAITS_DATE_SUPPRESSION = p_date_suppression,
+        SOUHAITS_COMMANDE_UID = p_commande_uid,
+        SOUHAITS_ARTICLE_UID = p_article_uid,
+        SOUHAITS_QUANTITÉ = p_quantite
+    WHERE SOUHAITS_UID = p_souhait_uid;
+END set_souhait;
+/
