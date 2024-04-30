@@ -248,190 +248,7 @@ CREATE TABLE ARTICLE_CATEGORIE
     REFERENCES CATEGORIE (CATEGORIE_ID)
 );
 
-
--- -- Getter Categorie
--- CREATE OR REPLACE PROCEDURE get_categorie (
---     p_categorie_id IN VARCHAR2,
---     p_categorie_uid OUT VARCHAR2,
---     p_categorie_nom OUT VARCHAR2,
---     p_categorie_description OUT CLOB
--- ) AS
--- BEGIN
---     SELECT CATEGORIE_UID, CATEGORIE_NOM, CATEGORIE_DESCRIPTION
---     INTO p_categorie_uid, p_categorie_nom, p_categorie_description
---     FROM CATEGORIE
---     WHERE CATEGORIE_ID = p_categorie_id;
--- END get_categorie;
--- /
-
--- -- Setter Categorie
--- CREATE OR REPLACE PROCEDURE set_categorie (
---     p_categorie_id IN VARCHAR2,
---     p_categorie_uid IN VARCHAR2,
---     p_categorie_nom IN VARCHAR2,
---     p_categorie_description IN CLOB
--- ) AS
--- BEGIN
---     UPDATE CATEGORIE
---     SET CATEGORIE_UID = p_categorie_uid,
---         CATEGORIE_NOM = p_categorie_nom,
---         CATEGORIE_DESCRIPTION = p_categorie_description
---     WHERE CATEGORIE_ID = p_categorie_id;
--- END set_categorie;
--- /
-
--- -- Getter Article_Categorie
--- CREATE OR REPLACE PROCEDURE get_article_categorie (
---     p_article_categorie_uid IN VARCHAR2,
---     p_article_categorie_id OUT VARCHAR2,
---     p_article_categorie_article_uid OUT VARCHAR2,
---     p_article_categorie_categorie_uid OUT VARCHAR2
--- ) AS
--- BEGIN
---     SELECT ARTICLE_CATEGORIE_ID, ARTICLE_CATEGORIE_ARTICLE_UID, ARTICLE_CATEGORIE_CATEGORIE_UID
---     INTO p_article_categorie_id, p_article_categorie_article_uid, p_article_categorie_categorie_uid
---     FROM ARTICLE_CATEGORIE
---     WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
--- END get_article_categorie;
--- /
-
--- -- Setter Article_Categorie
--- CREATE OR REPLACE PROCEDURE set_article_categorie (
---     p_article_categorie_uid IN VARCHAR2,
---     p_article_categorie_id IN VARCHAR2,
---     p_article_categorie_article_uid IN VARCHAR2,
---     p_article_categorie_categorie_uid IN VARCHAR2
--- ) AS
--- BEGIN
---     UPDATE ARTICLE_CATEGORIE
---     SET ARTICLE_CATEGORIE_ID = p_article_categorie_id,
---         ARTICLE_CATEGORIE_ARTICLE_UID = p_article_categorie_article_uid,
---         ARTICLE_CATEGORIE_CATEGORIE_UID = p_article_categorie_categorie_uid
---     WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
--- END set_article_categorie;
--- /
-
--- -- Getter Article
--- CREATE OR REPLACE PROCEDURE get_article (
---     p_article_uid IN VARCHAR2,
---     p_article_id OUT VARCHAR2,
---     p_article_nom OUT VARCHAR2,
---     p_article_description OUT VARCHAR2,
---     p_article_prix OUT NUMBER,
---     p_article_photo OUT VARCHAR2,
---     p_article_note OUT NUMBER,
---     p_article_date_creation OUT DATE,
---     p_article_date_suppression OUT DATE
--- ) AS
--- BEGIN
---     SELECT ARTICLE_ID, ARTICLE_NOM, ARTICLE_DESCRIPTION, ARTICLE_PRIX,
---            ARTICLE_PHOTO, ARTICLE_NOTE, ARTICLE_DATE_CREATION, ARTICLE_DATE_SUPPRESSION
---     INTO p_article_id, p_article_nom, p_article_description, p_article_prix,
---          p_article_photo, p_article_note, p_article_date_creation, p_article_date_suppression
---     FROM ARTICLE
---     WHERE ARTICLE_UID = p_article_uid;
--- END get_article;
--- /
-
--- --  Setter Article
--- CREATE OR REPLACE PROCEDURE set_article (
---     p_article_uid IN VARCHAR2,
---     p_article_id IN VARCHAR2,
---     p_article_nom IN VARCHAR2,
---     p_article_description IN VARCHAR2,
---     p_article_prix IN NUMBER,
---     p_article_photo IN VARCHAR2,
---     p_article_note IN NUMBER,
---     p_article_date_creation IN DATE,
---     p_article_date_suppression IN DATE
--- ) AS
--- BEGIN
---     UPDATE ARTICLE
---     SET ARTICLE_ID = p_article_id,
---         ARTICLE_NOM = p_article_nom,
---         ARTICLE_DESCRIPTION = p_article_description,
---         ARTICLE_PRIX = p_article_prix,
---         ARTICLE_PHOTO = p_article_photo,
---         ARTICLE_NOTE = p_article_note,
---         ARTICLE_DATE_CREATION = p_article_date_creation,
---         ARTICLE_DATE_SUPPRESSION = p_article_date_suppression
---     WHERE ARTICLE_UID = p_article_uid;
--- END set_article;
--- /
-
--- --  Getter Souhait
--- CREATE OR REPLACE PROCEDURE get_souhait (
---     p_souhait_uid IN VARCHAR2,
---     p_souhait_id OUT VARCHAR2,
---     p_utilisateur_uid OUT VARCHAR2,
---     p_date_ajout OUT DATE,
---     p_date_suppression OUT DATE,
---     p_commande_uid OUT VARCHAR2,
---     p_article_uid OUT VARCHAR2,
---     p_quantite OUT VARCHAR2
--- ) AS
--- BEGIN
---     SELECT SOUHAITS_ID, SOUHAITS_UTILISATEUR_UID, SOUHAITS_DATE_AJOUT,
---            SOUHAITS_DATE_SUPPRESSION, SOUHAITS_COMMANDE_UID, SOUHAITS_ARTICLE_UID,
---            SOUHAITS_QUANTITE
---     INTO p_souhait_id, p_utilisateur_uid, p_date_ajout, p_date_suppression,
---          p_commande_uid, p_article_uid, p_quantite
---     FROM SOUHAITS
---     WHERE SOUHAITS_UID = p_souhait_uid;
--- END get_souhait;
--- /
-
--- -- Setter Souhait
--- CREATE OR REPLACE PROCEDURE set_souhait (
---     p_souhait_uid IN VARCHAR2,
---     p_souhait_id IN VARCHAR2,
---     p_utilisateur_uid IN VARCHAR2,
---     p_date_ajout IN DATE,
---     p_date_suppression IN DATE,
---     p_commande_uid IN VARCHAR2,
---     p_article_uid IN VARCHAR2,
---     p_quantite IN VARCHAR2
--- ) AS
--- BEGIN
---     UPDATE SOUHAITS
---     SET SOUHAITS_ID = p_souhait_id,
---         SOUHAITS_UTILISATEUR_UID = p_utilisateur_uid,
---         SOUHAITS_DATE_AJOUT = p_date_ajout,
---         SOUHAITS_DATE_SUPPRESSION = p_date_suppression,
---         SOUHAITS_COMMANDE_UID = p_commande_uid,
---         SOUHAITS_ARTICLE_UID = p_article_uid,
---         SOUHAITS_QUANTITE = p_quantite
---     WHERE SOUHAITS_UID = p_souhait_uid;
--- END set_souhait;
--- /
-
--- -- Getter Commande_Article
-
--- CREATE OR REPLACE FUNCTION get_commande_article (
---     p_commande_article_uid IN VARCHAR2
--- ) RETURN NUMBER AS
---     v_quantite NUMBER;
--- BEGIN
---     SELECT QUANTITE INTO v_quantite
---     FROM V_COMMANDE_ARTICLE
---     WHERE COMMANDE_ARTICLE_UID = p_commande_article_uid;
---     RETURN v_quantite;
--- END get_commande_article;
--- /
-
-
--- -- Setter Commande_Article
-
--- CREATE OR REPLACE PROCEDURE set_commande_article (
---     p_commande_article_uid IN VARCHAR2,
---     p_quantite IN NUMBER
--- ) AS
--- BEGIN
---     UPDATE V_COMMANDE_ARTICLE
---     SET QUANTITE = p_quantite
---     WHERE COMMANDE_ARTICLE_UID = p_commande_article_uid;
--- END set_commande_article;
--- /
+-- GETTER/SETTER
 
 -- Accesseurs CATEGORIE
 
@@ -840,3 +657,20 @@ BEGIN
 END update_commande_article;
 /
 
+-- VIEWS
+
+-- Vue Statistique articles souhaités mais non commandés
+CREATE VIEW STATS_ARTICLES_SOUHAITES_SANS_COMMANDE AS
+SELECT
+    SA.SOUHAITS_ARTICLE_UID AS ARTICLE_UID,
+    A.ARTICLE_NOM,
+    A.ARTICLE_DESCRIPTION,
+    COUNT(SA.SOUHAITS_UID) AS NOMBRE_DE_SOUHAITS
+FROM
+    SOUHAITS SA
+JOIN
+    ARTICLE A ON SA.SOUHAITS_ARTICLE_UID = A.ARTICLE_UID
+WHERE
+    SA.SOUHAITS_COMMANDE_UID IS NULL
+GROUP BY
+    SA.SOUHAITS_ARTICLE_UID, A.ARTICLE_NOM, A.ARTICLE_DESCRIPTION;
