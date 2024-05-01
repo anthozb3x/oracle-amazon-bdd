@@ -91,7 +91,8 @@ CREATE TABLE CONVERSATION (
     CONSTRAINT CONVERSATION_PK PRIMARY KEY(CONVERSATION_UID) ENABLE
 );
 
-CREATE OR REPLACE PROCEDURE get_conversation (
+CREATE
+OR REPLACE PROCEDURE get_conversation (
     p_conversation_uid IN VARCHAR2,
     p_conversation_cursor OUT SYS_REFCURSOR
 ) AS BEGIN OPEN p_conversation_cursor FOR
@@ -104,45 +105,48 @@ WHERE
 
 END get_conversation;
 
-
-CREATE OR REPLACE PROCEDURE insert_conversation (
+CREATE
+OR REPLACE PROCEDURE insert_conversation (
     p_conversation_uid IN VARCHAR2,
     p_conversation_id IN VARCHAR2,
     p_column1 IN VARCHAR2
-)
-AS
-BEGIN
-    INSERT INTO CONVERSATION (
+) AS BEGIN
+INSERT INTO
+    CONVERSATION (
         CONVERSATION_UID,
         CONVERSATION_ID,
         COLUMN1
-    ) VALUES (
+    )
+VALUES
+    (
         p_conversation_uid,
         p_conversation_id,
         p_column1
     );
-    COMMIT;
-END insert_conversation;
-/
 
-CREATE OR REPLACE PROCEDURE update_conversation (
+COMMIT;
+
+END insert_conversation;
+
+/ CREATE
+OR REPLACE PROCEDURE update_conversation (
     p_conversation_uid IN VARCHAR2,
     p_conversation_id IN VARCHAR2,
     p_column1 IN VARCHAR2
-)
-AS
-BEGIN
-    UPDATE CONVERSATION
-    SET
-        CONVERSATION_ID = p_conversation_id,
-        COLUMN1 = p_column1
-    WHERE
-        CONVERSATION_UID = p_conversation_uid;
-    COMMIT;
-END update_conversation;
-/
+) AS BEGIN
+UPDATE
+    CONVERSATION
+SET
+    CONVERSATION_ID = p_conversation_id,
+    COLUMN1 = p_column1
+WHERE
+    CONVERSATION_UID = p_conversation_uid;
 
-CREATE TABLE MESSAGE (
+COMMIT;
+
+END update_conversation;
+
+/ CREATE TABLE MESSAGE (
     MESSAGE_UID VARCHAR2(255 BYTE) NOT NULL,
     MESSAGE_ID VARCHAR2(255 BYTE) NOT NULL,
     CONVERSATION_UID VARCHAR2(255 BYTE) NOT NULL,
@@ -155,20 +159,22 @@ CREATE TABLE MESSAGE (
     CONSTRAINT MESSAGE_FK_UTILISATEUR_DESTINATAIRE FOREIGN KEY (UTILISATEUR_DESTINATAIRE_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE
 );
 
-CREATE OR REPLACE PROCEDURE get_message (
+CREATE
+OR REPLACE PROCEDURE get_message (
     p_message_uid IN VARCHAR2,
     p_message_cursor OUT SYS_REFCURSOR
-)
-AS
-BEGIN
-    OPEN p_message_cursor FOR
-        SELECT *
-        FROM MESSAGE
-        WHERE MESSAGE_UID = p_message_uid;
-END get_message;
-/
+) AS BEGIN OPEN p_message_cursor FOR
+SELECT
+    *
+FROM
+    MESSAGE
+WHERE
+    MESSAGE_UID = p_message_uid;
 
-CREATE OR REPLACE PROCEDURE insert_message (
+END get_message;
+
+/ CREATE
+OR REPLACE PROCEDURE insert_message (
     p_message_uid IN VARCHAR2,
     p_message_id IN VARCHAR2,
     p_conversation_uid IN VARCHAR2,
@@ -176,10 +182,9 @@ CREATE OR REPLACE PROCEDURE insert_message (
     p_utilisateur_expediteur_uid IN VARCHAR2,
     p_date_message IN DATE,
     p_message_text IN CLOB
-)
-AS
-BEGIN
-    INSERT INTO MESSAGE (
+) AS BEGIN
+INSERT INTO
+    MESSAGE (
         MESSAGE_UID,
         MESSAGE_ID,
         CONVERSATION_UID,
@@ -187,7 +192,9 @@ BEGIN
         UTILISATEUR_EXPEDITEUR_UID,
         DATE_MESSAGE,
         MESSAGE
-    ) VALUES (
+    )
+VALUES
+    (
         p_message_uid,
         p_message_id,
         p_conversation_uid,
@@ -196,11 +203,13 @@ BEGIN
         p_date_message,
         p_message_text
     );
-    COMMIT;
-END insert_message;
-/
 
-CREATE OR REPLACE PROCEDURE update_message (
+COMMIT;
+
+END insert_message;
+
+/ CREATE
+OR REPLACE PROCEDURE update_message (
     p_message_uid IN VARCHAR2,
     p_message_id IN VARCHAR2,
     p_conversation_uid IN VARCHAR2,
@@ -208,25 +217,24 @@ CREATE OR REPLACE PROCEDURE update_message (
     p_utilisateur_expediteur_uid IN VARCHAR2,
     p_date_message IN DATE,
     p_message_text IN CLOB
-)
-AS
-BEGIN
-    UPDATE MESSAGE
-    SET
-        MESSAGE_ID = p_message_id,
-        CONVERSATION_UID = p_conversation_uid,
-        UTILISATEUR_DESTINATAIRE_UID = p_utilisateur_destinataire_uid,
-        UTILISATEUR_EXPEDITEUR_UID = p_utilisateur_expediteur_uid,
-        DATE_MESSAGE = p_date_message,
-        MESSAGE = p_message_text
-    WHERE
-        MESSAGE_UID = p_message_uid;
-    COMMIT;
+) AS BEGIN
+UPDATE
+    MESSAGE
+SET
+    MESSAGE_ID = p_message_id,
+    CONVERSATION_UID = p_conversation_uid,
+    UTILISATEUR_DESTINATAIRE_UID = p_utilisateur_destinataire_uid,
+    UTILISATEUR_EXPEDITEUR_UID = p_utilisateur_expediteur_uid,
+    DATE_MESSAGE = p_date_message,
+    MESSAGE = p_message_text
+WHERE
+    MESSAGE_UID = p_message_uid;
+
+COMMIT;
+
 END update_message;
-/
 
-
-CREATE TABLE ADRESSE (
+/ CREATE TABLE ADRESSE (
     ADRESSE_UID VARCHAR2(255) NOT NULL,
     ADRESSE_ID VARCHAR2(255) NOT NULL,
     ADRESSE_POSTALE VARCHAR2(255) NOT NULL,
@@ -236,10 +244,8 @@ CREATE TABLE ADRESSE (
     DATE_CREATION DATE NOT NULL,
     DATE_SUPPRESSION DATE,
     CONSTRAINT ADRESSE_PK PRIMARY KEY (ADRESSE_UID),
-    CONSTRAINT FK_ADRESSE_UTILISATEUR FOREIGN KEY (UTILISATEUR_UID)
-        REFERENCES UTILISATEUR (UTILISATEUR_UID)
+    CONSTRAINT FK_ADRESSE_UTILISATEUR FOREIGN KEY (UTILISATEUR_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID)
 );
-
 
 CREATE TABLE HISTORIQUE_ADRESSE (
     HISTORIQUE_ADRESSE_UID VARCHAR2(255) NOT NULL,
@@ -292,8 +298,7 @@ CREATE TABLE SOUHAITS (
     SOUHAITS_UID VARCHAR2(255) NOT NULL,
     SOUHAITS_UTILISATEUR_UID VARCHAR2(255) NOT NULL,
     SOUHAITS_DATE_AJOUT DATE NOT NULL,
-    SOUHAITS_DATE_SUPPRESSION DATEch
-    SOUHAITS_COMMANDE_UID VARCHAR2(255),
+    SOUHAITS_DATE_SUPPRESSION DATEch SOUHAITS_COMMANDE_UID VARCHAR2(255),
     SOUHAITS_ARTICLE_UID VARCHAR2(255) NOT NULL,
     SOUHAITS_QUANTITÉ VARCHAR2(255),
     CONSTRAINT SOUHAITS_PK PRIMARY KEY (SOUHAITS_UID),
@@ -424,11 +429,14 @@ WHERE
 END get_adresse;
 
 / -- Setter (INSERT) procedure for ADRESSE
+-- Setter (INSERT) procedure for ADRESSE
 CREATE
 OR REPLACE PROCEDURE insert_adresse (
     p_adresse_uid IN VARCHAR2,
     p_adresse_id IN VARCHAR2,
     p_adresse_postale IN VARCHAR2,
+    p_adresse_region IN VARCHAR2,
+    p_utilisateur_uid IN VARCHAR2,
     p_est_favorite IN NUMBER,
     p_date_creation IN DATE,
     p_date_suppression IN DATE
@@ -438,6 +446,8 @@ INSERT INTO
         ADRESSE_UID,
         ADRESSE_ID,
         ADRESSE_POSTALE,
+        ADRESSE_REGION,
+        UTILISATEUR_UID,
         EST_FAVORITE,
         DATE_CREATION,
         DATE_SUPPRESSION
@@ -447,6 +457,8 @@ VALUES
         p_adresse_uid,
         p_adresse_id,
         p_adresse_postale,
+        p_adresse_region,
+        p_utilisateur_uid,
         p_est_favorite,
         p_date_creation,
         p_date_suppression
@@ -456,12 +468,14 @@ COMMIT;
 
 END insert_adresse;
 
-/ -- Setter (UPDATE) procedure for ADRESSE
+/ / -- Setter (UPDATE) procedure for ADRESSE
 CREATE
 OR REPLACE PROCEDURE update_adresse (
     p_adresse_uid IN VARCHAR2,
     p_adresse_id IN VARCHAR2,
     p_adresse_postale IN VARCHAR2,
+    p_adresse_region IN VARCHAR2,
+    p_utilisateur_uid IN VARCHAR2,
     p_est_favorite IN NUMBER,
     p_date_creation IN DATE,
     p_date_suppression IN DATE
@@ -471,6 +485,8 @@ UPDATE
 SET
     ADRESSE_ID = p_adresse_id,
     ADRESSE_POSTALE = p_adresse_postale,
+    ADRESSE_REGION = p_adresse_region,
+    UTILISATEUR_UID = p_utilisateur_uid,
     EST_FAVORITE = p_est_favorite,
     DATE_CREATION = p_date_creation,
     DATE_SUPPRESSION = p_date_suppression
@@ -483,7 +499,8 @@ END update_adresse;
 
 / -- Table COMMANDE
 -- Procedure pour insérer une ligne dans la table COMMANDE
-CREATE OR REPLACE PROCEDURE insert_commande (
+CREATE
+OR REPLACE PROCEDURE insert_commande (
     p_commande_uid IN VARCHAR2,
     p_commande_date IN DATE,
     p_utilisateur_acheteur_uid IN VARCHAR2,
@@ -491,9 +508,9 @@ CREATE OR REPLACE PROCEDURE insert_commande (
     p_adresse_expedition_uid IN VARCHAR2,
     p_adresse_destination_uid IN VARCHAR2,
     p_montant_total IN NUMBER
-) IS
-BEGIN
-    INSERT INTO COMMANDE (
+) IS BEGIN
+INSERT INTO
+    COMMANDE (
         COMMANDE_UID,
         COMMANDE_DATE,
         UTILISATEUR_ACHETEUR_UID,
@@ -501,7 +518,9 @@ BEGIN
         ADRESSE_EXPEDITION_UID,
         ADRESSE_DESTINANTION_UID,
         MONTANT_TOTAL
-    ) VALUES (
+    )
+VALUES
+    (
         p_commande_uid,
         p_commande_date,
         p_utilisateur_acheteur_uid,
@@ -510,7 +529,9 @@ BEGIN
         p_adresse_destination_uid,
         p_montant_total
     );
-    COMMIT;
+
+COMMIT;
+
 END;
 
 / -- Procedure pour supprimer une ligne dans la table COMMANDE depuis COMMANDE_UID
@@ -526,7 +547,8 @@ COMMIT;
 END delete_commande;
 
 / -- Procedure pour mettre à jour une ligne dans la table COMMANDE depuis COMMANDE_UID
-CREATE OR REPLACE PROCEDURE update_commande (
+CREATE
+OR REPLACE PROCEDURE update_commande (
     p_commande_uid IN VARCHAR2,
     p_commande_date IN DATE,
     p_utilisateur_acheteur_uid IN VARCHAR2,
@@ -534,18 +556,21 @@ CREATE OR REPLACE PROCEDURE update_commande (
     p_adresse_expedition_uid IN VARCHAR2,
     p_adresse_destination_uid IN VARCHAR2,
     p_montant_total IN NUMBER
-) IS
-BEGIN
-    UPDATE COMMANDE
-    SET
-        COMMANDE_DATE = p_commande_date,
-        UTILISATEUR_ACHETEUR_UID = p_utilisateur_acheteur_uid,
-        UTILISATEUR_VENDEUR_UID = p_utilisateur_vendeur_uid,
-        ADRESSE_EXPEDITION_UID = p_adresse_expedition_uid,
-        ADRESSE_DESTINANTION_UID = p_adresse_destination_uid,
-        MONTANT_TOTAL = p_montant_total
-    WHERE COMMANDE_UID = p_commande_uid;
-    COMMIT;
+) IS BEGIN
+UPDATE
+    COMMANDE
+SET
+    COMMANDE_DATE = p_commande_date,
+    UTILISATEUR_ACHETEUR_UID = p_utilisateur_acheteur_uid,
+    UTILISATEUR_VENDEUR_UID = p_utilisateur_vendeur_uid,
+    ADRESSE_EXPEDITION_UID = p_adresse_expedition_uid,
+    ADRESSE_DESTINANTION_UID = p_adresse_destination_uid,
+    MONTANT_TOTAL = p_montant_total
+WHERE
+    COMMANDE_UID = p_commande_uid;
+
+COMMIT;
+
 END;
 
 / -- Fonction pour récupérer une ligne dans la table COMMANDE depuis COMMANDE_UID
@@ -614,45 +639,25 @@ insert_utilisateur(
 END;
 
 / -- Insertion des adresses
-BEGIN insert_adresse(
-    '1',
-    'Adresse1',
-    '123 Rue de la Paix',
-    1,
-    SYSDATE,
-    NULL
-);
-
-insert_adresse(
-    '2',
-    'Adresse2',
-    '456 Avenue des Champs-Élysées',
-    0,
-    SYSDATE,
-    NULL
-);
-
-insert_adresse(
-    '3',
-    'Adresse3',
-    '789 Boulevard Saint-Germain',
-    1,
-    SYSDATE,
-    NULL
-);
-
+BEGIN
+    insert_adresse('1', 'Adresse1', '123 Rue de la Paix', 'Île-de-France', 'U1', 1, SYSDATE, NULL);
+    insert_adresse('2', 'Adresse2', '456 Avenue des Champs-Élysées', 'Auvergne-Rhône-Alpes', 'U2', 0, SYSDATE, NULL);
+    insert_adresse('3', 'Adresse3', '789 Boulevard Saint-Germain', 'Provence-Alpes-Côte d Azur', 'U3', 1, SYSDATE, NULL);
 END;
 
 / -- Insertion des commandes
-BEGIN insert_commande('1', SYSDATE, '1', '2', '1', '2');
+BEGIN insert_commande('1', SYSDATE, '1', '2', '1', '2', 150.00);
 
-insert_commande('2', SYSDATE, '3', '4', '2', '1');
+-- Ajout du montant total pour la commande 1
+insert_commande('2', SYSDATE, '3', '4', '2', '1', 200.00);
 
-insert_commande('3', SYSDATE, '2', '3', '3', '3');
+-- Ajout du montant total pour la commande 2
+insert_commande('3', SYSDATE, '2', '3', '3', '3', 250.00);
 
+-- Ajout du montant total pour la commande 3
 END;
 
-/ -- Test des getters
+/ / -- Test des getters
 -- Test du getter pour UTILISATEUR avec l'ID 1
 DECLARE utilisateur_cursor SYS_REFCURSOR;
 
@@ -713,32 +718,43 @@ CLOSE utilisateur_cursor;
 
 END;
 
-
 /**VIEW*/
-
 -- permet d'avoir le nombre d'utilisateur part region
-CREATE OR REPLACE VIEW VUE_UTILISATEURS_REGION AS
-SELECT 
+CREATE
+OR REPLACE VIEW VUE_UTILISATEURS_REGION AS
+SELECT
     a.ADRESSE_REGION,
     COUNT(DISTINCT a.UTILISATEUR_UID) AS NOMBRE_UTILISATEURS,
-    ROUND((COUNT(DISTINCT a.UTILISATEUR_UID) / total.total_users) * 100, 2) AS POURCENTAGE
-FROM 
+    ROUND(
+        (
+            COUNT(DISTINCT a.UTILISATEUR_UID) / total.total_users
+        ) * 100,
+        2
+    ) AS POURCENTAGE
+FROM
     ADRESSE a,
-    (SELECT COUNT(DISTINCT UTILISATEUR_UID) AS total_users FROM ADRESSE WHERE UTILISATEUR_UID IS NOT NULL) total
-WHERE 
+    (
+        SELECT
+            COUNT(DISTINCT UTILISATEUR_UID) AS total_users
+        FROM
+            ADRESSE
+        WHERE
+            UTILISATEUR_UID IS NOT NULL
+    ) total
+WHERE
     a.UTILISATEUR_UID IS NOT NULL
-GROUP BY 
-    a.ADRESSE_REGION, total.total_users;
+GROUP BY
+    a.ADRESSE_REGION,
+    total.total_users;
 
 -- Cette vue peut montrer pour chaque utilisateur :
-
 --     Le nombre total de commandes.
 --     La date de la première commande.
 --     La date de la dernière commande.
 --     Le montant total dépensé
-
-CREATE OR REPLACE VIEW VUE_STATISTIQUES_COMMANDES_UTILISATEUR AS
-SELECT 
+CREATE
+OR REPLACE VIEW VUE_STATISTIQUES_COMMANDES_UTILISATEUR AS
+SELECT
     u.UTILISATEUR_UID,
     u.NOM,
     u.PRENOM,
@@ -747,10 +763,22 @@ SELECT
     MIN(c.COMMANDE_DATE) AS PREMIERE_COMMANDE,
     MAX(c.COMMANDE_DATE) AS DERNIERE_COMMANDE,
     NVL(SUM(c.MONTANT_TOTAL), 0) AS MONTANT_TOTAL_DEPENSE,
-    ROUND((NVL(SUM(c.MONTANT_TOTAL), 0) / t.TOTAL_GLOBAL) * 100, 2) AS POURCENTAGE_DU_TOTAL_GLOBAL
-FROM 
+    ROUND(
+        (NVL(SUM(c.MONTANT_TOTAL), 0) / t.TOTAL_GLOBAL) * 100,
+        2
+    ) AS POURCENTAGE_DU_TOTAL_GLOBAL
+FROM
     UTILISATEUR u
-LEFT JOIN COMMANDE c ON u.UTILISATEUR_UID = c.UTILISATEUR_ACHETEUR_UID,
-    (SELECT NVL(SUM(MONTANT_TOTAL), 0) AS TOTAL_GLOBAL FROM COMMANDE) t
-GROUP BY 
-    u.UTILISATEUR_UID, u.NOM, u.PRENOM, u.EMAIL, t.TOTAL_GLOBAL;
+    LEFT JOIN COMMANDE c ON u.UTILISATEUR_UID = c.UTILISATEUR_ACHETEUR_UID,
+    (
+        SELECT
+            NVL(SUM(MONTANT_TOTAL), 0) AS TOTAL_GLOBAL
+        FROM
+            COMMANDE
+    ) t
+GROUP BY
+    u.UTILISATEUR_UID,
+    u.NOM,
+    u.PRENOM,
+    u.EMAIL,
+    t.TOTAL_GLOBAL;
