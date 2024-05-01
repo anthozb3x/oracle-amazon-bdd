@@ -91,150 +91,7 @@ CREATE TABLE CONVERSATION (
     CONSTRAINT CONVERSATION_PK PRIMARY KEY(CONVERSATION_UID) ENABLE
 );
 
-CREATE
-OR REPLACE PROCEDURE get_conversation (
-    p_conversation_uid IN VARCHAR2,
-    p_conversation_cursor OUT SYS_REFCURSOR
-) AS BEGIN OPEN p_conversation_cursor FOR
-SELECT
-    *
-FROM
-    CONVERSATION
-WHERE
-    CONVERSATION_UID = p_conversation_uid;
-
-END get_conversation;
-
-CREATE
-OR REPLACE PROCEDURE insert_conversation (
-    p_conversation_uid IN VARCHAR2,
-    p_conversation_id IN VARCHAR2,
-    p_column1 IN VARCHAR2
-) AS BEGIN
-INSERT INTO
-    CONVERSATION (
-        CONVERSATION_UID,
-        CONVERSATION_ID,
-        COLUMN1
-    )
-VALUES
-    (
-        p_conversation_uid,
-        p_conversation_id,
-        p_column1
-    );
-
-COMMIT;
-
-END insert_conversation;
-
-/ CREATE
-OR REPLACE PROCEDURE update_conversation (
-    p_conversation_uid IN VARCHAR2,
-    p_conversation_id IN VARCHAR2,
-    p_column1 IN VARCHAR2
-) AS BEGIN
-UPDATE
-    CONVERSATION
-SET
-    CONVERSATION_ID = p_conversation_id,
-    COLUMN1 = p_column1
-WHERE
-    CONVERSATION_UID = p_conversation_uid;
-
-COMMIT;
-
-END update_conversation;
-
-/ CREATE TABLE MESSAGE (
-    MESSAGE_UID VARCHAR2(255 BYTE) NOT NULL,
-    MESSAGE_ID VARCHAR2(255 BYTE) NOT NULL,
-    CONVERSATION_UID VARCHAR2(255 BYTE) NOT NULL,
-    UTILISATEUR_DESTINATAIRE_UID VARCHAR2(255 BYTE) NOT NULL,
-    UTILISATEUR_EXPEDITEUR_UID VARCHAR2(255 BYTE) NOT NULL,
-    DATE_MESSAGE DATE NOT NULL,
-    MESSAGE CLOB NOT NULL,
-    CONSTRAINT MESSAGE_PK PRIMARY KEY (MESSAGE_UID),
-    CONSTRAINT MESSAGE_FK_UTILISATEUR_EXPEDITEUR FOREIGN KEY (UTILISATEUR_EXPEDITEUR_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE,
-    CONSTRAINT MESSAGE_FK_UTILISATEUR_DESTINATAIRE FOREIGN KEY (UTILISATEUR_DESTINATAIRE_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE
-);
-
-CREATE
-OR REPLACE PROCEDURE get_message (
-    p_message_uid IN VARCHAR2,
-    p_message_cursor OUT SYS_REFCURSOR
-) AS BEGIN OPEN p_message_cursor FOR
-SELECT
-    *
-FROM
-    MESSAGE
-WHERE
-    MESSAGE_UID = p_message_uid;
-
-END get_message;
-
-/ CREATE
-OR REPLACE PROCEDURE insert_message (
-    p_message_uid IN VARCHAR2,
-    p_message_id IN VARCHAR2,
-    p_conversation_uid IN VARCHAR2,
-    p_utilisateur_destinataire_uid IN VARCHAR2,
-    p_utilisateur_expediteur_uid IN VARCHAR2,
-    p_date_message IN DATE,
-    p_message_text IN CLOB
-) AS BEGIN
-INSERT INTO
-    MESSAGE (
-        MESSAGE_UID,
-        MESSAGE_ID,
-        CONVERSATION_UID,
-        UTILISATEUR_DESTINATAIRE_UID,
-        UTILISATEUR_EXPEDITEUR_UID,
-        DATE_MESSAGE,
-        MESSAGE
-    )
-VALUES
-    (
-        p_message_uid,
-        p_message_id,
-        p_conversation_uid,
-        p_utilisateur_destinataire_uid,
-        p_utilisateur_expediteur_uid,
-        p_date_message,
-        p_message_text
-    );
-
-COMMIT;
-
-END insert_message;
-
-/ CREATE
-OR REPLACE PROCEDURE update_message (
-    p_message_uid IN VARCHAR2,
-    p_message_id IN VARCHAR2,
-    p_conversation_uid IN VARCHAR2,
-    p_utilisateur_destinataire_uid IN VARCHAR2,
-    p_utilisateur_expediteur_uid IN VARCHAR2,
-    p_date_message IN DATE,
-    p_message_text IN CLOB
-) AS BEGIN
-UPDATE
-    MESSAGE
-SET
-    MESSAGE_ID = p_message_id,
-    CONVERSATION_UID = p_conversation_uid,
-    UTILISATEUR_DESTINATAIRE_UID = p_utilisateur_destinataire_uid,
-    UTILISATEUR_EXPEDITEUR_UID = p_utilisateur_expediteur_uid,
-    DATE_MESSAGE = p_date_message,
-    MESSAGE = p_message_text
-WHERE
-    MESSAGE_UID = p_message_uid;
-
-COMMIT;
-
-END update_message;
-
-/ CREATE TABLE ADRESSE (
+ CREATE TABLE ADRESSE (
     ADRESSE_UID VARCHAR2(255) NOT NULL,
     ADRESSE_ID VARCHAR2(255) NOT NULL,
     ADRESSE_POSTALE VARCHAR2(255) NOT NULL,
@@ -327,6 +184,153 @@ CREATE TABLE ARTICLE_CATEGORIE (
     CONSTRAINT ARTICLE_CATEGORIE_ARTICLE_FK FOREIGN KEY (ARTICLE_CATEGORIE_ARTICLE_UID) REFERENCES ARTICLE (ARTICLE_UID),
     CONSTRAINT ARTICLE_CATEGORIE_CATEGORIE_FK FOREIGN KEY (ARTICLE_CATEGORIE_CATEGORIE_UID) REFERENCES CATEGORIE (CATEGORIE_ID)
 );
+
+CREATE TABLE MESSAGE (
+    MESSAGE_UID VARCHAR2(255 BYTE) NOT NULL,
+    MESSAGE_ID VARCHAR2(255 BYTE) NOT NULL,
+    CONVERSATION_UID VARCHAR2(255 BYTE) NOT NULL,
+    UTILISATEUR_DESTINATAIRE_UID VARCHAR2(255 BYTE) NOT NULL,
+    UTILISATEUR_EXPEDITEUR_UID VARCHAR2(255 BYTE) NOT NULL,
+    DATE_MESSAGE DATE NOT NULL,
+    MESSAGE CLOB NOT NULL,
+    CONSTRAINT MESSAGE_PK PRIMARY KEY (MESSAGE_UID),
+    CONSTRAINT MESSAGE_FK_UTILISATEUR_EXPEDITEUR FOREIGN KEY (UTILISATEUR_EXPEDITEUR_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE,
+    CONSTRAINT MESSAGE_FK_UTILISATEUR_DESTINATAIRE FOREIGN KEY (UTILISATEUR_DESTINATAIRE_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE
+);
+
+CREATE
+OR REPLACE PROCEDURE get_conversation (
+    p_conversation_uid IN VARCHAR2,
+    p_conversation_cursor OUT SYS_REFCURSOR
+) AS BEGIN OPEN p_conversation_cursor FOR
+SELECT
+    *
+FROM
+    CONVERSATION
+WHERE
+    CONVERSATION_UID = p_conversation_uid;
+
+END get_conversation;
+
+CREATE
+OR REPLACE PROCEDURE insert_conversation (
+    p_conversation_uid IN VARCHAR2,
+    p_conversation_id IN VARCHAR2,
+    p_column1 IN VARCHAR2
+) AS BEGIN
+INSERT INTO
+    CONVERSATION (
+        CONVERSATION_UID,
+        CONVERSATION_ID,
+        COLUMN1
+    )
+VALUES
+    (
+        p_conversation_uid,
+        p_conversation_id,
+        p_column1
+    );
+
+COMMIT;
+
+END insert_conversation;
+
+/ CREATE
+OR REPLACE PROCEDURE update_conversation (
+    p_conversation_uid IN VARCHAR2,
+    p_conversation_id IN VARCHAR2,
+    p_column1 IN VARCHAR2
+) AS BEGIN
+UPDATE
+    CONVERSATION
+SET
+    CONVERSATION_ID = p_conversation_id,
+    COLUMN1 = p_column1
+WHERE
+    CONVERSATION_UID = p_conversation_uid;
+
+COMMIT;
+
+END update_conversation;
+
+/ 
+
+CREATE
+OR REPLACE PROCEDURE get_message (
+    p_message_uid IN VARCHAR2,
+    p_message_cursor OUT SYS_REFCURSOR
+) AS BEGIN OPEN p_message_cursor FOR
+SELECT
+    *
+FROM
+    MESSAGE
+WHERE
+    MESSAGE_UID = p_message_uid;
+
+END get_message;
+
+/ CREATE
+OR REPLACE PROCEDURE insert_message (
+    p_message_uid IN VARCHAR2,
+    p_message_id IN VARCHAR2,
+    p_conversation_uid IN VARCHAR2,
+    p_utilisateur_destinataire_uid IN VARCHAR2,
+    p_utilisateur_expediteur_uid IN VARCHAR2,
+    p_date_message IN DATE,
+    p_message_text IN CLOB
+) AS BEGIN
+INSERT INTO
+    MESSAGE (
+        MESSAGE_UID,
+        MESSAGE_ID,
+        CONVERSATION_UID,
+        UTILISATEUR_DESTINATAIRE_UID,
+        UTILISATEUR_EXPEDITEUR_UID,
+        DATE_MESSAGE,
+        MESSAGE
+    )
+VALUES
+    (
+        p_message_uid,
+        p_message_id,
+        p_conversation_uid,
+        p_utilisateur_destinataire_uid,
+        p_utilisateur_expediteur_uid,
+        p_date_message,
+        p_message_text
+    );
+
+COMMIT;
+
+END insert_message;
+
+/ CREATE
+OR REPLACE PROCEDURE update_message (
+    p_message_uid IN VARCHAR2,
+    p_message_id IN VARCHAR2,
+    p_conversation_uid IN VARCHAR2,
+    p_utilisateur_destinataire_uid IN VARCHAR2,
+    p_utilisateur_expediteur_uid IN VARCHAR2,
+    p_date_message IN DATE,
+    p_message_text IN CLOB
+) AS BEGIN
+UPDATE
+    MESSAGE
+SET
+    MESSAGE_ID = p_message_id,
+    CONVERSATION_UID = p_conversation_uid,
+    UTILISATEUR_DESTINATAIRE_UID = p_utilisateur_destinataire_uid,
+    UTILISATEUR_EXPEDITEUR_UID = p_utilisateur_expediteur_uid,
+    DATE_MESSAGE = p_date_message,
+    MESSAGE = p_message_text
+WHERE
+    MESSAGE_UID = p_message_uid;
+
+COMMIT;
+
+END update_message;
+
+/
 
 -- GETTERS SETTERS
 -- Table Utilisateurs
