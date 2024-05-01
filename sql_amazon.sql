@@ -483,37 +483,35 @@ END update_adresse;
 
 / -- Table COMMANDE
 -- Procedure pour insérer une ligne dans la table COMMANDE
-CREATE
-OR REPLACE PROCEDURE insert_commande (
+CREATE OR REPLACE PROCEDURE insert_commande (
     p_commande_uid IN VARCHAR2,
     p_commande_date IN DATE,
     p_utilisateur_acheteur_uid IN VARCHAR2,
     p_utilisateur_vendeur_uid IN VARCHAR2,
     p_adresse_expedition_uid IN VARCHAR2,
-    p_adresse_destination_uid IN VARCHAR2
-) IS BEGIN
-INSERT INTO
-    COMMANDE (
+    p_adresse_destination_uid IN VARCHAR2,
+    p_montant_total IN NUMBER
+) IS
+BEGIN
+    INSERT INTO COMMANDE (
         COMMANDE_UID,
         COMMANDE_DATE,
         UTILISATEUR_ACHETEUR_UID,
         UTILISATEUR_VENDEUR_UID,
         ADRESSE_EXPEDITION_UID,
-        ADRESSE_DESTINANTION_UID
-    )
-VALUES
-    (
+        ADRESSE_DESTINANTION_UID,
+        MONTANT_TOTAL
+    ) VALUES (
         p_commande_uid,
         p_commande_date,
         p_utilisateur_acheteur_uid,
         p_utilisateur_vendeur_uid,
         p_adresse_expedition_uid,
-        p_adresse_destination_uid
+        p_adresse_destination_uid,
+        p_montant_total
     );
-
-COMMIT;
-
-END insert_commande;
+    COMMIT;
+END;
 
 / -- Procedure pour supprimer une ligne dans la table COMMANDE depuis COMMANDE_UID
 CREATE
@@ -528,29 +526,27 @@ COMMIT;
 END delete_commande;
 
 / -- Procedure pour mettre à jour une ligne dans la table COMMANDE depuis COMMANDE_UID
-CREATE
-OR REPLACE PROCEDURE update_commande (
+CREATE OR REPLACE PROCEDURE update_commande (
     p_commande_uid IN VARCHAR2,
     p_commande_date IN DATE,
     p_utilisateur_acheteur_uid IN VARCHAR2,
     p_utilisateur_vendeur_uid IN VARCHAR2,
     p_adresse_expedition_uid IN VARCHAR2,
-    p_adresse_destination_uid IN VARCHAR2
-) IS BEGIN
-UPDATE
-    COMMANDE
-SET
-    COMMANDE_DATE = p_commande_date,
-    UTILISATEUR_ACHETEUR_UID = p_utilisateur_acheteur_uid,
-    UTILISATEUR_VENDEUR_UID = p_utilisateur_vendeur_uid,
-    ADRESSE_EXPEDITION_UID = p_adresse_expedition_uid,
-    ADRESSE_DESTINANTION_UID = p_adresse_destination_uid
-WHERE
-    COMMANDE_UID = p_commande_uid;
-
-COMMIT;
-
-END update_commande;
+    p_adresse_destination_uid IN VARCHAR2,
+    p_montant_total IN NUMBER
+) IS
+BEGIN
+    UPDATE COMMANDE
+    SET
+        COMMANDE_DATE = p_commande_date,
+        UTILISATEUR_ACHETEUR_UID = p_utilisateur_acheteur_uid,
+        UTILISATEUR_VENDEUR_UID = p_utilisateur_vendeur_uid,
+        ADRESSE_EXPEDITION_UID = p_adresse_expedition_uid,
+        ADRESSE_DESTINANTION_UID = p_adresse_destination_uid,
+        MONTANT_TOTAL = p_montant_total
+    WHERE COMMANDE_UID = p_commande_uid;
+    COMMIT;
+END;
 
 / -- Fonction pour récupérer une ligne dans la table COMMANDE depuis COMMANDE_UID
 CREATE
