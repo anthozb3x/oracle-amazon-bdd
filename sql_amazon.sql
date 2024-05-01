@@ -104,7 +104,7 @@ CREATE TABLE "AMAZONDATABASE"."UTILISATEUR"
 CREATE TABLE CONVERSATION (
                               CONVERSATION_UID VARCHAR2(255) NOT NULL,
                               CONVERSATION_ID VARCHAR2(255) NOT NULL,
-                              COLUMN1 VARCHAR2(255) NOT NULL,
+                              OBJET VARCHAR2(255) NOT NULL,
                               CONSTRAINT CONVERSATION_PK PRIMARY KEY(CONVERSATION_UID) ENABLE
 );
 
@@ -334,7 +334,7 @@ END get_conversation;
 
 CREATE OR REPLACE PROCEDURE insert_conversation (
     p_conversation_id IN VARCHAR2,
-    p_column1 IN VARCHAR2
+    p_objet IN VARCHAR2
 ) AS
     v_conversation_uid VARCHAR2(255);
 BEGIN
@@ -343,11 +343,11 @@ BEGIN
     INSERT INTO CONVERSATION (
         CONVERSATION_UID,
         CONVERSATION_ID,
-        COLUMN1
+        OBJET
     ) VALUES (
                  v_conversation_uid,
                  p_conversation_id,
-                 p_column1
+                 p_objet
              );
 
     COMMIT;
@@ -359,13 +359,13 @@ CREATE
     OR REPLACE PROCEDURE update_conversation (
     p_conversation_uid IN VARCHAR2,
     p_conversation_id IN VARCHAR2,
-    p_column1 IN VARCHAR2
+    p_objet IN VARCHAR2
 ) AS BEGIN
     UPDATE
         CONVERSATION
     SET
         CONVERSATION_ID = p_conversation_id,
-        COLUMN1 = p_column1
+        OBJET = p_objet
     WHERE
         CONVERSATION_UID = p_conversation_uid;
 
