@@ -254,13 +254,26 @@ CREATE SEQUENCE  "AMAZONDATABASE"."ARTICLE_CATEGORIE_LOG_SEQ"  MINVALUE 1 MAXVAL
 -- GETTERS SETTERS
 CREATE OR REPLACE PROCEDURE insert_categorie (
     p_categorie_id IN VARCHAR2,
-    p_categorie_uid IN VARCHAR2,
     p_categorie_nom IN VARCHAR2,
     p_categorie_description IN CLOB
-) AS
+) AS 
+    v_categorie_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO CATEGORIE (CATEGORIE_ID, CATEGORIE_UID, CATEGORIE_NOM, CATEGORIE_DESCRIPTION)
-    VALUES (p_categorie_id, p_categorie_uid, p_categorie_nom, p_categorie_description);
+    SELECT CATEGORIE_LOG_SEQ.NEXTVAL INTO v_categorie_uid FROM DUAL;
+
+    INSERT INTO CATEGORIE (
+        CATEGORIE_ID,
+        CATEGORIE_UID,
+        CATEGORIE_NOM,
+        CATEGORIE_DESCRIPTION
+    ) VALUES (
+        p_categorie_id,
+        v_categorie_uid,
+        p_categorie_nom,
+        p_categorie_description
+    );
+
+    COMMIT;
 END insert_categorie;
 /
 
@@ -319,29 +332,28 @@ CREATE
 END get_conversation;
 /
 
-CREATE
-    OR REPLACE PROCEDURE insert_conversation (
-    p_conversation_uid IN VARCHAR2,
+CREATE OR REPLACE PROCEDURE insert_conversation (
     p_conversation_id IN VARCHAR2,
     p_column1 IN VARCHAR2
-) AS BEGIN
-    INSERT INTO
-        CONVERSATION (
+) AS 
+    v_conversation_uid VARCHAR2(255);
+BEGIN
+    SELECT CONVERSATION_LOG_SEQ.NEXTVAL INTO v_conversation_uid FROM DUAL;
+
+    INSERT INTO CONVERSATION (
         CONVERSATION_UID,
         CONVERSATION_ID,
         COLUMN1
-    )
-    VALUES
-        (
-            p_conversation_uid,
-            p_conversation_id,
-            p_column1
-        );
+    ) VALUES (
+        v_conversation_uid,
+        p_conversation_id,
+        p_column1
+    );
 
     COMMIT;
-
 END insert_conversation;
 /
+
 
 CREATE
     OR REPLACE PROCEDURE update_conversation (
@@ -379,18 +391,19 @@ END get_message;
 
 /
 
-CREATE
-    OR REPLACE PROCEDURE insert_message (
-    p_message_uid IN VARCHAR2,
+CREATE OR REPLACE PROCEDURE insert_message (
     p_message_id IN VARCHAR2,
     p_conversation_uid IN VARCHAR2,
     p_utilisateur_destinataire_uid IN VARCHAR2,
     p_utilisateur_expediteur_uid IN VARCHAR2,
     p_date_message IN DATE,
-    p_message_text IN CLOB
-) AS BEGIN
-    INSERT INTO
-        MESSAGE (
+    p_message IN CLOB
+) AS 
+    v_message_uid VARCHAR2(255);
+BEGIN
+    SELECT MESSAGE_LOG_SEQ.NEXTVAL INTO v_message_uid FROM DUAL;
+
+    INSERT INTO MESSAGE (
         MESSAGE_UID,
         MESSAGE_ID,
         CONVERSATION_UID,
@@ -398,23 +411,20 @@ CREATE
         UTILISATEUR_EXPEDITEUR_UID,
         DATE_MESSAGE,
         MESSAGE
-    )
-    VALUES
-        (
-            p_message_uid,
-            p_message_id,
-            p_conversation_uid,
-            p_utilisateur_destinataire_uid,
-            p_utilisateur_expediteur_uid,
-            p_date_message,
-            p_message_text
-        );
+    ) VALUES (
+        v_message_uid,
+        p_message_id,
+        p_conversation_uid,
+        p_utilisateur_destinataire_uid,
+        p_utilisateur_expediteur_uid,
+        p_date_message,
+        p_message
+    );
 
     COMMIT;
-
 END insert_message;
-
 /
+
 
 CREATE
     OR REPLACE PROCEDURE update_message (
@@ -459,9 +469,7 @@ END get_utilisateur;
 /
 
 -- Setter (INSERT) procedure for UTILISATEUR
-CREATE
-    OR REPLACE PROCEDURE insert_utilisateur (
-    p_utilisateur_uid IN VARCHAR2,
+CREATE OR REPLACE PROCEDURE insert_utilisateur (
     p_utilisateur_id IN NUMBER,
     p_nom IN VARCHAR2,
     p_prenom IN VARCHAR2,
@@ -469,9 +477,13 @@ CREATE
     p_est_vendeur IN NUMBER,
     p_date_creation IN DATE,
     p_date_suppression IN DATE
-) AS BEGIN
-    INSERT INTO
-        "AMAZONDATABASE"."UTILISATEUR" (
+) AS 
+    v_utilisateur_uid VARCHAR2(255);
+BEGIN
+    
+    SELECT UTILISATEUR_LOG_SEQ.NEXTVAL INTO v_utilisateur_uid FROM DUAL;
+
+    INSERT INTO "AMAZONDATABASE"."UTILISATEUR" (
         "UTILISATEUR_UID",
         "UTILISATEUR_ID",
         "NOM",
@@ -481,18 +493,20 @@ CREATE
         "DATE_CREATION",
         "DATE_SUPRESSION"
     ) VALUES (
-                 p_utilisateur_uid,
-                 p_utilisateur_id,
-                 p_nom,
-                 p_prenom,
-                 p_email,
-                 p_est_vendeur,
-                 p_date_creation,
-                 p_date_suppression
-             );
+        v_utilisateur_uid,
+        p_utilisateur_id,
+        p_nom,
+        p_prenom,
+        p_email,
+        p_est_vendeur,
+        p_date_creation,
+        p_date_suppression
+    );
+
     COMMIT;
 END insert_utilisateur;
 /
+
 
 -- Setter (UPDATE) procedure for UTILISATEUR
 CREATE OR REPLACE PROCEDURE update_utilisateur (
@@ -541,7 +555,6 @@ END get_adresse;
 
 -- Setter (INSERT) procedure for ADRESSE
 CREATE OR REPLACE PROCEDURE insert_adresse (
-    p_adresse_uid IN VARCHAR2,
     p_adresse_id IN VARCHAR2,
     p_adresse_postale IN VARCHAR2,
     p_adresse_region IN VARCHAR2,
@@ -549,9 +562,12 @@ CREATE OR REPLACE PROCEDURE insert_adresse (
     p_est_favorite IN NUMBER,
     p_date_creation IN DATE,
     p_date_suppression IN DATE
-) AS BEGIN
-    INSERT INTO
-        ADRESSE (
+) AS 
+    v_adresse_uid VARCHAR2(255);
+BEGIN
+    SELECT ADRESSE_LOG_SEQ.NEXTVAL INTO v_adresse_uid FROM DUAL;
+
+    INSERT INTO ADRESSE (
         ADRESSE_UID,
         ADRESSE_ID,
         ADRESSE_POSTALE,
@@ -560,21 +576,18 @@ CREATE OR REPLACE PROCEDURE insert_adresse (
         EST_FAVORITE,
         DATE_CREATION,
         DATE_SUPPRESSION
-    )
-    VALUES
-        (
-            p_adresse_uid,
-            p_adresse_id,
-            p_adresse_postale,
-            p_adresse_region,
-            p_utilisateur_uid,
-            p_est_favorite,
-            p_date_creation,
-            p_date_suppression
-        );
+    ) VALUES (
+        v_adresse_uid,
+        p_adresse_id,
+        p_adresse_postale,
+        p_adresse_region,
+        p_utilisateur_uid,
+        p_est_favorite,
+        p_date_creation,
+        p_date_suppression
+    );
 
     COMMIT;
-
 END insert_adresse;
 /
 
@@ -612,40 +625,42 @@ END update_adresse;
 -- Table COMMANDE
 -- Procedure pour insérer une ligne dans la table COMMANDE
 CREATE OR REPLACE PROCEDURE insert_commande (
-    p_commande_uid IN VARCHAR2,
+    p_commande_id IN VARCHAR2,
     p_commande_date IN DATE,
     p_utilisateur_acheteur_uid IN VARCHAR2,
     p_utilisateur_vendeur_uid IN VARCHAR2,
     p_adresse_expedition_uid IN VARCHAR2,
     p_adresse_destination_uid IN VARCHAR2,
     p_montant_total IN NUMBER
-) IS BEGIN
-    INSERT INTO
-        COMMANDE (
+) AS 
+    v_commande_uid VARCHAR2(255);
+BEGIN
+    SELECT COMMANDE_LOG_SEQ.NEXTVAL INTO v_commande_uid FROM DUAL;
+
+    INSERT INTO COMMANDE (
         COMMANDE_UID,
+        COMMANDE_ID,
         COMMANDE_DATE,
         UTILISATEUR_ACHETEUR_UID,
         UTILISATEUR_VENDEUR_UID,
         ADRESSE_EXPEDITION_UID,
         ADRESSE_DESTINANTION_UID,
         MONTANT_TOTAL
-    )
-    VALUES
-        (
-            p_commande_uid,
-            p_commande_date,
-            p_utilisateur_acheteur_uid,
-            p_utilisateur_vendeur_uid,
-            p_adresse_expedition_uid,
-            p_adresse_destination_uid,
-            p_montant_total
-        );
+    ) VALUES (
+        v_commande_uid,
+        p_commande_id,
+        p_commande_date,
+        p_utilisateur_acheteur_uid,
+        p_utilisateur_vendeur_uid,
+        p_adresse_expedition_uid,
+        p_adresse_destination_uid,
+        p_montant_total
+    );
 
     COMMIT;
-
-END;
-
+END insert_commande;
 /
+
 
 -- Procedure pour supprimer une ligne dans la table COMMANDE depuis COMMANDE_UID
 CREATE
@@ -707,14 +722,27 @@ END get_commande;
 
 -- INSERT
 CREATE OR REPLACE PROCEDURE insert_article_categorie (
-    p_article_categorie_uid IN VARCHAR2,
     p_article_categorie_id IN VARCHAR2,
     p_article_categorie_article_uid IN VARCHAR2,
     p_article_categorie_categorie_uid IN VARCHAR2
-) AS
+) AS 
+    v_article_categorie_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO ARTICLE_CATEGORIE (ARTICLE_CATEGORIE_UID, ARTICLE_CATEGORIE_ID, ARTICLE_CATEGORIE_ARTICLE_UID, ARTICLE_CATEGORIE_CATEGORIE_UID)
-    VALUES (p_article_categorie_uid, p_article_categorie_id, p_article_categorie_article_uid, p_article_categorie_categorie_uid);
+    SELECT ARTICLE_CATEGORIE_LOG_SEQ.NEXTVAL INTO v_article_categorie_uid FROM DUAL;
+
+    INSERT INTO ARTICLE_CATEGORIE (
+        ARTICLE_CATEGORIE_UID,
+        ARTICLE_CATEGORIE_ID,
+        ARTICLE_CATEGORIE_ARTICLE_UID,
+        ARTICLE_CATEGORIE_CATEGORIE_UID
+    ) VALUES (
+        v_article_categorie_uid,
+        p_article_categorie_id,
+        p_article_categorie_article_uid,
+        p_article_categorie_categorie_uid
+    );
+
+    COMMIT;
 END insert_article_categorie;
 /
 
@@ -760,7 +788,6 @@ END get_article_categorie_info;
 /
 
 CREATE OR REPLACE PROCEDURE insert_article (
-    p_article_uid IN VARCHAR2,
     p_article_id IN VARCHAR2,
     p_article_nom IN VARCHAR2,
     p_article_description IN VARCHAR2,
@@ -769,12 +796,37 @@ CREATE OR REPLACE PROCEDURE insert_article (
     p_article_note IN NUMBER,
     p_article_date_creation IN DATE,
     p_article_date_suppression IN DATE
-) AS
+) AS 
+    v_article_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO ARTICLE (ARTICLE_UID, ARTICLE_ID, ARTICLE_NOM, ARTICLE_DESCRIPTION, ARTICLE_PRIX, ARTICLE_PHOTO, ARTICLE_NOTE, ARTICLE_DATE_CREATION, ARTICLE_DATE_SUPPRESSION)
-    VALUES (p_article_uid, p_article_id, p_article_nom, p_article_description, p_article_prix, p_article_photo, p_article_note, p_article_date_creation, p_article_date_suppression);
+    SELECT ARTICLE_LOG_SEQ.NEXTVAL INTO v_article_uid FROM DUAL;
+
+    INSERT INTO ARTICLE (
+        ARTICLE_UID,
+        ARTICLE_ID,
+        ARTICLE_NOM,
+        ARTICLE_DESCRIPTION,
+        ARTICLE_PRIX,
+        ARTICLE_PHOTO,
+        ARTICLE_NOTE,
+        ARTICLE_DATE_CREATION,
+        ARTICLE_DATE_SUPPRESSION
+    ) VALUES (
+        v_article_uid,
+        p_article_id,
+        p_article_nom,
+        p_article_description,
+        p_article_prix,
+        p_article_photo,
+        p_article_note,
+        p_article_date_creation,
+        p_article_date_suppression
+    );
+
+    COMMIT;
 END insert_article;
 /
+
 
 -- DELETE
 CREATE OR REPLACE PROCEDURE delete_article (
@@ -834,17 +886,35 @@ END get_article_info;
 
 CREATE OR REPLACE PROCEDURE insert_souhait (
     p_souhait_id IN VARCHAR2,
-    p_souhait_uid IN VARCHAR2,
-    p_utilisateur_uid IN VARCHAR2,
-    p_date_ajout IN DATE,
-    p_date_suppression IN DATE,
-    p_commande_uid IN VARCHAR2,
-    p_article_uid IN VARCHAR2,
-    p_quantite IN VARCHAR2
-) AS
+    p_souhait_utilisateur_uid IN VARCHAR2,
+    p_souhait_date_ajout IN DATE,
+    p_souhait_commande_uid IN VARCHAR2,
+    p_souhait_article_uid IN VARCHAR2,
+    p_souhait_quantite IN VARCHAR2
+) AS 
+    v_souhait_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO SOUHAITS (SOUHAITS_ID, SOUHAITS_UID, SOUHAITS_UTILISATEUR_UID, SOUHAITS_DATE_AJOUT, SOUHAITS_DATE_SUPPRESSION, SOUHAITS_COMMANDE_UID, SOUHAITS_ARTICLE_UID, SOUHAITS_QUANTITÉ)
-    VALUES (p_souhait_id, p_souhait_uid, p_utilisateur_uid, p_date_ajout, p_date_suppression, p_commande_uid, p_article_uid, p_quantite);
+    SELECT SOUHAIT_LOG_SEQ.NEXTVAL INTO v_souhait_uid FROM DUAL;
+
+    INSERT INTO SOUHAITS (
+        SOUHAITS_ID,
+        SOUHAITS_UID,
+        SOUHAITS_UTILISATEUR_UID,
+        SOUHAITS_DATE_AJOUT,
+        SOUHAITS_COMMANDE_UID,
+        SOUHAITS_ARTICLE_UID,
+        SOUHAITS_QUANTITÉ
+    ) VALUES (
+        p_souhait_id,
+        v_souhait_uid,
+        p_souhait_utilisateur_uid,
+        p_souhait_date_ajout,
+        p_souhait_commande_uid,
+        p_souhait_article_uid,
+        p_souhait_quantite
+    );
+
+    COMMIT;
 END insert_souhait;
 /
 
@@ -906,16 +976,30 @@ END get_souhait_info;
 
 -- INSERT
 CREATE OR REPLACE PROCEDURE insert_historique_adresse (
-    p_historique_adresse_uid IN VARCHAR2,
     p_id IN NUMBER,
     p_adresse_initial_uid IN VARCHAR2,
     p_adresse_uid IN VARCHAR2
-) AS
+) AS 
+    v_historique_adresse_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO HISTORIQUE_ADRESSE (HISTORIQUE_ADRESSE_UID, ID, ADRESSE_INITIAL_UID, ADRESSE_UID)
-    VALUES (p_historique_adresse_uid, p_id, p_adresse_initial_uid, p_adresse_uid);
+    SELECT HISTORIQUE_ADRESSE_LOG_SEQ.NEXTVAL INTO v_historique_adresse_uid FROM DUAL;
+
+    INSERT INTO HISTORIQUE_ADRESSE (
+        HISTORIQUE_ADRESSE_UID,
+        ID,
+        ADRESSE_INITIAL_UID,
+        ADRESSE_UID
+    ) VALUES (
+        v_historique_adresse_uid,
+        p_id,
+        p_adresse_initial_uid,
+        p_adresse_uid
+    );
+
+    COMMIT;
 END insert_historique_adresse;
 /
+
 
 -- DELETE
 CREATE OR REPLACE PROCEDURE delete_historique_adresse (
@@ -962,15 +1046,30 @@ END get_historique_adresse_info;
 
 -- INSERT
 CREATE OR REPLACE PROCEDURE insert_commande_article (
-    p_commande_article_uid IN VARCHAR2,
     p_commande_article_id IN VARCHAR2,
     p_commande_uid IN VARCHAR2,
     p_quantite IN NUMBER,
-    p_article_uid IN VARCHAR2
-) AS
+    p_commande_article_article_uid IN VARCHAR2
+) AS 
+    v_commande_article_uid VARCHAR2(255);
 BEGIN
-    INSERT INTO COMMANDE_ARTICLE (COMMANDE_ARTICLE_UID, COMMANDE_ARTICLE_ID, COMMANDE_UID, QUANTITÉ, COMMANDE_ARTICLE_ARTICLE_UID)
-    VALUES (p_commande_article_uid, p_commande_article_id, p_commande_uid, p_quantite, p_article_uid);
+    SELECT COMMANDE_ARTICLE_LOG_SEQ.NEXTVAL INTO v_commande_article_uid FROM DUAL;
+
+    INSERT INTO COMMANDE_ARTICLE (
+        COMMANDE_ARTICLE_UID,
+        COMMANDE_ARTICLE_ID,
+        COMMANDE_UID,
+        QUANTITÉ,
+        COMMANDE_ARTICLE_ARTICLE_UID
+    ) VALUES (
+        v_commande_article_uid,
+        p_commande_article_id,
+        p_commande_uid,
+        p_quantite,
+        p_commande_article_article_uid
+    );
+
+    COMMIT;
 END insert_commande_article;
 /
 
@@ -1053,6 +1152,42 @@ FROM
 GROUP BY
     AC.ARTICLE_CATEGORIE_CATEGORIE_UID, C.CATEGORIE_NOM;
 
+-- Vue permettant d'avoir le nombre d'utilisateur part region
+CREATE OR REPLACE VIEW VUE_UTILISATEURS_REGION AS
+SELECT 
+    a.ADRESSE_REGION,
+    COUNT(DISTINCT a.UTILISATEUR_UID) AS NOMBRE_UTILISATEURS,
+    ROUND((COUNT(DISTINCT a.UTILISATEUR_UID) / total.total_users) * 100, 2) AS POURCENTAGE
+FROM 
+    ADRESSE a,
+    (SELECT COUNT(DISTINCT UTILISATEUR_UID) AS total_users FROM ADRESSE WHERE UTILISATEUR_UID IS NOT NULL) total
+WHERE 
+    a.UTILISATEUR_UID IS NOT NULL
+GROUP BY 
+    a.ADRESSE_REGION, total.total_users;
+
+-- Cette vue peut montrer pour chaque utilisateur :
+--     Le nombre total de commandes.
+--     La date de la première commande.
+--     La date de la dernière commande.
+--     Le montant total dépensé
+CREATE OR REPLACE VIEW VUE_STATISTIQUES_COMMANDES_UTILISATEUR AS
+SELECT 
+    u.UTILISATEUR_UID,
+    u.NOM,
+    u.PRENOM,
+    u.EMAIL,
+    COUNT(c.COMMANDE_UID) AS TOTAL_COMMANDES,
+    MIN(c.COMMANDE_DATE) AS PREMIERE_COMMANDE,
+    MAX(c.COMMANDE_DATE) AS DERNIERE_COMMANDE,
+    NVL(SUM(c.MONTANT_TOTAL), 0) AS MONTANT_TOTAL_DEPENSE,
+    ROUND((NVL(SUM(c.MONTANT_TOTAL), 0) / t.TOTAL_GLOBAL) * 100, 2) AS POURCENTAGE_DU_TOTAL_GLOBAL
+FROM 
+    UTILISATEUR u
+LEFT JOIN COMMANDE c ON u.UTILISATEUR_UID = c.UTILISATEUR_ACHETEUR_UID,
+    (SELECT NVL(SUM(MONTANT_TOTAL), 0) AS TOTAL_GLOBAL FROM COMMANDE) t
+GROUP BY 
+    u.UTILISATEUR_UID, u.NOM, u.PRENOM, u.EMAIL, t.TOTAL_GLOBAL;
 
 -- Journaux de Log
 
@@ -1091,62 +1226,117 @@ BEGIN
 END;
 /
 
--- Création d'un jeu de donnée de test
+-- Création d un jeu de donnée de test
+
 -- Insertion des utilisateurs
 BEGIN
-    insert_utilisateur('1', 1, 'John', 'Doe', 'john.doe@example.com', 0, SYSDATE, NULL);
-    insert_utilisateur('2', 2, 'Jane', 'Smith', 'jane.smith@example.com', 1, SYSDATE, NULL);
-    insert_utilisateur('3', 3, 'Alice', 'Johnson', 'alice.johnson@example.com', 0, SYSDATE, NULL);
-    insert_utilisateur('4', 4, 'Bob', 'Brown', 'bob.brown@example.com', 1, SYSDATE, NULL);
+    insert_utilisateur(1, 'Smith', 'John', 'john.smith@email.com', 1, TO_DATE('2023-01-15', 'YYYY-MM-DD'), NULL);
+    insert_utilisateur(2, 'Johnson', 'Alice', 'alice.johnson@email.com', 0, TO_DATE('2023-02-20', 'YYYY-MM-DD'), NULL);
+    insert_utilisateur(3, 'Williams', 'David', 'david.williams@email.com', 1, TO_DATE('2023-03-10', 'YYYY-MM-DD'), NULL);
+    insert_utilisateur(4, 'Jones', 'Emma', 'emma.jones@email.com', 0, TO_DATE('2023-04-05', 'YYYY-MM-DD'), NULL);
+    insert_utilisateur(5, 'Brown', 'Michael', 'michael.brown@email.com', 1, TO_DATE('2023-05-12', 'YYYY-MM-DD'), NULL);
+    COMMIT;
 END;
 /
 
 -- Insertion des adresses
 BEGIN
-    insert_adresse('1', 'Adresse1', '123 Rue de la Paix', 'Île-de-France', '1', 1, SYSDATE, NULL);
-    insert_adresse('2', 'Adresse2', '456 Avenue des Champs-Élysées', 'Auvergne-Rhône-Alpes', '2', 0, SYSDATE, NULL);
+    insert_adresse('1', '123 Rue de la République', 'Paris', '1', 1, SYSDATE, NULL);
+    insert_adresse('2', '456 Avenue des Champs-Élysées', 'Paris', '2', 0, SYSDATE, NULL);
+    insert_adresse('3', '789 Boulevard Saint-Germain', 'Paris', '3', 1, SYSDATE, NULL);
+    insert_adresse('4', '101 Rue du Faubourg Saint-Honoré', 'Paris', '4', 0, SYSDATE, NULL);
+    insert_adresse('5', '222 Quai de la Rapée', 'Paris', '5', 1, SYSDATE, NULL);
+    COMMIT;
 END;
 /
 
 -- Insertion des commandes
 BEGIN
-    insert_commande('1', SYSDATE, '1', '2', '1', '2', 150);
-    insert_commande('2', SYSDATE, '3', '2', '2', '1', 200);
-    insert_commande('3', SYSDATE, '2', '3', '2', '1', 250);
+    insert_commande('1', TO_DATE('2024-04-20', 'YYYY-MM-DD'), '1', '2', '1', '2', 150);
+    insert_commande('2', TO_DATE('2024-04-21', 'YYYY-MM-DD'), '2', '3', '2', '3', 200);
+    COMMIT;
 END;
 /
 
 -- Insertion des articles
 BEGIN
-    insert_article('1', '1', 'Article 1', 'Description de l''article 1', 100, 'photo1.jpg', 4, SYSDATE, NULL);
-    insert_article('2', '2', 'Article 2', 'Description de l''article 2', 200, 'photo2.jpg', 3, SYSDATE, NULL);
-    insert_article('3', '3', 'Article 3', 'Description de l''article 3', 300, 'photo3.jpg', 5, SYSDATE, NULL);
+    insert_article('1', 'Téléphone', 'Smartphone dernière génération', 799, 'phone.jpg', 4, SYSDATE, NULL);
+    insert_article('2', 'Ordinateur portable', 'Ordinateur portable ultra-fin', 1499, 'laptop.jpg', 4, SYSDATE, NULL);
+    insert_article('3', 'Casque audio', 'Casque audio sans fil avec réduction de bruit', 299, 'headphones.jpg', 4, SYSDATE, NULL);
+    insert_article('4', 'Montre connectée', 'Montre connectée avec suivi d activité', 199, 'smartwatch.jpg', 4, SYSDATE, NULL);
+    insert_article('5', 'Enceinte Bluetooth', 'Enceinte Bluetooth portable', 99, 'speaker.jpg', 4, SYSDATE, NULL);
+    COMMIT;
 END;
 /
+
 -- Insertion des commandes_articles
 BEGIN
-    insert_commande_article('1', '1', '1', 1, '1');
-    insert_commande_article('2', '2', '2', 2, '2');
-    insert_commande_article('3', '3', '3', 3, '3');
+    insert_commande_article('1', '1', 2, '1');
+    insert_commande_article('2', '2', 1, '2');
+    COMMIT;
 END;
+/
 
 -- Insertion des souhaits
 BEGIN
-    insert_souhait('1', '1', '1', SYSDATE, NULL, '1', '1', '1');
-    insert_souhait('2', '2', '2', SYSDATE, NULL, '2', '2', '2');
-    insert_souhait('3', '3', '3', SYSDATE, NULL, '3', '3', '3');
+    insert_souhait('1', '1', TO_DATE('2024-05-01', 'YYYY-MM-DD'), NULL, '1', '2');
+    insert_souhait('2', '2', TO_DATE('2024-05-01', 'YYYY-MM-DD'), NULL, '2', '1');
 END;
 /
 -- Insertion des catégories
 BEGIN
-    insert_categorie('1', '1', 'Catégorie 1', 'Description de la catégorie 1');
-    insert_categorie('2', '2', 'Catégorie 2', 'Description de la catégorie 2');
-    insert_categorie('3', '3', 'Catégorie 3', 'Description de la catégorie 3');
-    insert_categorie('4', '4', 'Catégorie 4', 'Description de la catégorie 4');
+    insert_categorie('1', 'Electronique', 'Catégorie regroupant les produits électroniques tels que les smartphones, les ordinateurs, etc.');
+    insert_categorie('2', 'Maison et Jardin', 'Catégorie regroupant les produits pour la maison et le jardin tels que les meubles, les outils de jardinage, etc.');
     COMMIT;
-    DBMS_OUTPUT.PUT_LINE('Jeu de données pour les catégories inséré avec succès.');
-EXCEPTION
-    WHEN OTHERS THEN
-        DBMS_OUTPUT.PUT_LINE('Erreur lors de l''insertion des données pour les catégories: ' || SQLERRM);
 END;
 /
+
+-- Insertion des conversations
+BEGIN
+    insert_conversation('1', 'Valeur1');
+    COMMIT;
+END;
+/
+
+-- Insertion des messages
+BEGIN
+    insert_message('1', '1', '1', '2', TO_DATE('2024-05-01', 'YYYY-MM-DD'), 'Contenu du message 1');
+    insert_message('2', '1', '2', '1', TO_DATE('2024-05-02', 'YYYY-MM-DD'), 'Contenu du message 2');
+    COMMIT;
+END;
+
+-- Insertion des articles catégories
+BEGIN
+    insert_article_categorie('1', '1', '1');
+    insert_article_categorie('2', '2', '2');
+    COMMIT;
+END;
+/
+
+--Insertion des historiques d'adresse
+BEGIN
+    insert_historique_adresse(1, '1', '2');
+    insert_historique_adresse(2, '2', '3');
+
+    COMMIT;
+END;
+
+
+
+-- PIVOT
+SELECT *
+FROM (
+  SELECT ADRESSE_REGION, EST_FAVORITE
+  FROM ADRESSE
+)
+PIVOT (
+  COUNT(EST_FAVORITE)
+  FOR EST_FAVORITE IN (0 AS Non_Favorite, 1 AS Favorite)
+)
+
+-- LISTAGG des utilisateurs par régions
+SELECT ADRESSE_REGION, 
+       LISTAGG(NOM || ' ' || PRENOM, ', ') WITHIN GROUP (ORDER BY NOM) AS Utilisateurs
+FROM UTILISATEUR
+JOIN ADRESSE ON UTILISATEUR.UTILISATEUR_UID = ADRESSE.UTILISATEUR_UID
+GROUP BY ADRESSE_REGION;
