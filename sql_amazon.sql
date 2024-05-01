@@ -1242,10 +1242,10 @@ END;
 -- Insertion des adresses
 BEGIN
     insert_adresse('1', '123 Rue de la République', 'Paris', '1', 1, SYSDATE, NULL);
-    insert_adresse('2', '456 Avenue des Champs-Élysées', 'Paris', '2', 0, SYSDATE, NULL);
+    insert_adresse('2', '456 Avenue des Champs-Élysées', 'Lyon', '2', 0, SYSDATE, NULL);
     insert_adresse('3', '789 Boulevard Saint-Germain', 'Paris', '3', 1, SYSDATE, NULL);
-    insert_adresse('4', '101 Rue du Faubourg Saint-Honoré', 'Paris', '4', 0, SYSDATE, NULL);
-    insert_adresse('5', '222 Quai de la Rapée', 'Paris', '5', 1, SYSDATE, NULL);
+    insert_adresse('4', '101 Rue du Faubourg Saint-Honoré', 'Bordeaux', '4', 0, SYSDATE, NULL);
+    insert_adresse('5', '222 Quai de la Rapée', 'Lyon', '5', 1, SYSDATE, NULL);
     COMMIT;
 END;
 /
