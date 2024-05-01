@@ -11,6 +11,8 @@ ALTER USER "AMAZONDATABASE" DEFAULT TABLESPACE "USERS" TEMPORARY TABLESPACE "TEM
 -- SYSTEM PRIVILEGES
 GRANT CREATE TRIGGER TO "AMAZONDATABASE";
 
+GRANT CREATE SEQUENCE TO "AMAZONDATABASE";
+
 GRANT CREATE PROCEDURE TO  "AMAZONDATABASE";
 
 GRANT CREATE ANY INDEX TO "AMAZONDATABASE";
@@ -57,11 +59,26 @@ GRANT UNDER ANY VIEW TO "AMAZONDATABASE";
 GRANT GRANT ANY PRIVILEGE TO "AMAZONDATABASE"; -- Crée la base de données AMAZON_DATABSE et ce connecter avec l'user configurer juste au dessus
 */
 
--- Drop toutes les tables
--- Drop all tables
+-- Drop toutes les tables et de toutes les vues
 BEGIN
+    -- Suppression de toutes les tables
     FOR table_rec IN (SELECT table_name FROM user_tables) LOOP
             EXECUTE IMMEDIATE 'DROP TABLE ' || table_rec.table_name || ' CASCADE CONSTRAINTS';
+        END LOOP;
+
+    -- Suppression de toutes les vues
+    FOR view_rec IN (SELECT view_name FROM user_views) LOOP
+            EXECUTE IMMEDIATE 'DROP VIEW ' || view_rec.view_name;
+        END LOOP;
+
+    -- Suppression de tous les triggers
+    FOR trigger_rec IN (SELECT trigger_name FROM user_triggers) LOOP
+            EXECUTE IMMEDIATE 'DROP TRIGGER ' || trigger_rec.trigger_name;
+        END LOOP;
+
+    -- Suppression de toutes les séquences
+    FOR sequence_rec IN (SELECT sequence_name FROM user_sequences) LOOP
+            EXECUTE IMMEDIATE 'DROP SEQUENCE ' || sequence_rec.sequence_name;
         END LOOP;
 END;
 /
@@ -102,6 +119,13 @@ CREATE TABLE ADRESSE (
                          DATE_SUPPRESSION DATE,
                          CONSTRAINT ADRESSE_PK PRIMARY KEY (ADRESSE_UID),
                          CONSTRAINT FK_ADRESSE_UTILISATEUR FOREIGN KEY (UTILISATEUR_UID) REFERENCES UTILISATEUR (UTILISATEUR_UID)
+);
+
+CREATE TABLE ADRESSE_LOG (
+                             LOG_ID NUMBER PRIMARY KEY,
+                             ADRESSE_ID VARCHAR2(255),
+                             ACTION VARCHAR2(10),
+                             TIMESTAMP TIMESTAMP
 );
 
 CREATE TABLE HISTORIQUE_ADRESSE (
@@ -171,6 +195,13 @@ CREATE TABLE SOUHAITS
         REFERENCES UTILISATEUR (UTILISATEUR_UID) ENABLE
 );
 
+CREATE TABLE SOUHAITS_LOG (
+                              LOG_ID NUMBER PRIMARY KEY,
+                              SOUHAITS_ID VARCHAR2(255),
+                              ACTION VARCHAR2(10),
+                              TIMESTAMP TIMESTAMP
+);
+
 CREATE TABLE COMMANDE_ARTICLE (
                                   COMMANDE_ARTICLE_UID VARCHAR2(255) NOT NULL,
                                   COMMANDE_ARTICLE_ID VARCHAR2(255) NOT NULL,
@@ -206,6 +237,57 @@ CREATE TABLE MESSAGE (
 );
 /
 -- GETTERS SETTERS
+CREATE OR REPLACE PROCEDURE insert_categorie (
+    p_categorie_id IN VARCHAR2,
+    p_categorie_uid IN VARCHAR2,
+    p_categorie_nom IN VARCHAR2,
+    p_categorie_description IN CLOB
+) AS
+BEGIN
+    INSERT INTO CATEGORIE (CATEGORIE_ID, CATEGORIE_UID, CATEGORIE_NOM, CATEGORIE_DESCRIPTION)
+    VALUES (p_categorie_id, p_categorie_uid, p_categorie_nom, p_categorie_description);
+END insert_categorie;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_categorie (
+    p_categorie_id IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM CATEGORIE
+    WHERE CATEGORIE_ID = p_categorie_id;
+END delete_categorie;
+/
+
+-- UPDATE
+CREATE OR REPLACE PROCEDURE update_categorie (
+    p_categorie_id IN VARCHAR2,
+    p_categorie_uid IN VARCHAR2,
+    p_categorie_nom IN VARCHAR2,
+    p_categorie_description IN CLOB
+) AS
+BEGIN
+    UPDATE CATEGORIE
+    SET CATEGORIE_UID = p_categorie_uid,
+        CATEGORIE_NOM = p_categorie_nom,
+        CATEGORIE_DESCRIPTION = p_categorie_description
+    WHERE CATEGORIE_ID = p_categorie_id;
+END update_categorie;
+/
+
+CREATE OR REPLACE PROCEDURE get_categorie_info (
+    p_categorie_id IN VARCHAR2,
+    p_categorie_uid OUT VARCHAR2,
+    p_categorie_nom OUT VARCHAR2,
+    p_categorie_description OUT CLOB
+) AS
+BEGIN
+    SELECT CATEGORIE_UID, CATEGORIE_NOM, CATEGORIE_DESCRIPTION
+    INTO p_categorie_uid, p_categorie_nom, p_categorie_description
+    FROM CATEGORIE
+    WHERE CATEGORIE_ID = p_categorie_id;
+END get_categorie_info;
+/
 
 CREATE
     OR REPLACE PROCEDURE get_conversation (
@@ -608,6 +690,395 @@ RETURN p_commande_cursor;
 END get_commande;
 /
 
+-- INSERT
+CREATE OR REPLACE PROCEDURE insert_article_categorie (
+    p_article_categorie_uid IN VARCHAR2,
+    p_article_categorie_id IN VARCHAR2,
+    p_article_categorie_article_uid IN VARCHAR2,
+    p_article_categorie_categorie_uid IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO ARTICLE_CATEGORIE (ARTICLE_CATEGORIE_UID, ARTICLE_CATEGORIE_ID, ARTICLE_CATEGORIE_ARTICLE_UID, ARTICLE_CATEGORIE_CATEGORIE_UID)
+    VALUES (p_article_categorie_uid, p_article_categorie_id, p_article_categorie_article_uid, p_article_categorie_categorie_uid);
+END insert_article_categorie;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_article_categorie (
+    p_article_categorie_uid IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM ARTICLE_CATEGORIE
+    WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
+END delete_article_categorie;
+/
+
+-- UPDATE
+CREATE OR REPLACE PROCEDURE update_article_categorie (
+    p_article_categorie_uid IN VARCHAR2,
+    p_article_categorie_id IN VARCHAR2,
+    p_article_categorie_article_uid IN VARCHAR2,
+    p_article_categorie_categorie_uid IN VARCHAR2
+) AS
+BEGIN
+    UPDATE ARTICLE_CATEGORIE
+    SET ARTICLE_CATEGORIE_ID = p_article_categorie_id,
+        ARTICLE_CATEGORIE_ARTICLE_UID = p_article_categorie_article_uid,
+        ARTICLE_CATEGORIE_CATEGORIE_UID = p_article_categorie_categorie_uid
+    WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
+END update_article_categorie;
+/
+
+-- GET
+CREATE OR REPLACE PROCEDURE get_article_categorie_info (
+    p_article_categorie_uid IN VARCHAR2,
+    p_article_categorie_id OUT VARCHAR2,
+    p_article_categorie_article_uid OUT VARCHAR2,
+    p_article_categorie_categorie_uid OUT VARCHAR2
+) AS
+BEGIN
+    SELECT ARTICLE_CATEGORIE_ID, ARTICLE_CATEGORIE_ARTICLE_UID, ARTICLE_CATEGORIE_CATEGORIE_UID
+    INTO p_article_categorie_id, p_article_categorie_article_uid, p_article_categorie_categorie_uid
+    FROM ARTICLE_CATEGORIE
+    WHERE ARTICLE_CATEGORIE_UID = p_article_categorie_uid;
+END get_article_categorie_info;
+/
+
+CREATE OR REPLACE PROCEDURE insert_article (
+    p_article_uid IN VARCHAR2,
+    p_article_id IN VARCHAR2,
+    p_article_nom IN VARCHAR2,
+    p_article_description IN VARCHAR2,
+    p_article_prix IN NUMBER,
+    p_article_photo IN VARCHAR2,
+    p_article_note IN NUMBER,
+    p_article_date_creation IN DATE,
+    p_article_date_suppression IN DATE
+) AS
+BEGIN
+    INSERT INTO ARTICLE (ARTICLE_UID, ARTICLE_ID, ARTICLE_NOM, ARTICLE_DESCRIPTION, ARTICLE_PRIX, ARTICLE_PHOTO, ARTICLE_NOTE, ARTICLE_DATE_CREATION, ARTICLE_DATE_SUPPRESSION)
+    VALUES (p_article_uid, p_article_id, p_article_nom, p_article_description, p_article_prix, p_article_photo, p_article_note, p_article_date_creation, p_article_date_suppression);
+END insert_article;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_article (
+    p_article_uid IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM ARTICLE
+    WHERE ARTICLE_UID = p_article_uid;
+END delete_article;
+/
+
+-- UPDATE
+CREATE OR REPLACE PROCEDURE update_article (
+    p_article_uid IN VARCHAR2,
+    p_article_id IN VARCHAR2,
+    p_article_nom IN VARCHAR2,
+    p_article_description IN VARCHAR2,
+    p_article_prix IN NUMBER,
+    p_article_photo IN VARCHAR2,
+    p_article_note IN NUMBER,
+    p_article_date_creation IN DATE,
+    p_article_date_suppression IN DATE
+) AS
+BEGIN
+    UPDATE ARTICLE
+    SET ARTICLE_ID = p_article_id,
+        ARTICLE_NOM = p_article_nom,
+        ARTICLE_DESCRIPTION = p_article_description,
+        ARTICLE_PRIX = p_article_prix,
+        ARTICLE_PHOTO = p_article_photo,
+        ARTICLE_NOTE = p_article_note,
+        ARTICLE_DATE_CREATION = p_article_date_creation,
+        ARTICLE_DATE_SUPPRESSION = p_article_date_suppression
+    WHERE ARTICLE_UID = p_article_uid;
+END update_article;
+/
+
+-- GET
+CREATE OR REPLACE PROCEDURE get_article_info (
+    p_article_uid IN VARCHAR2,
+    p_article_id OUT VARCHAR2,
+    p_article_nom OUT VARCHAR2,
+    p_article_description OUT VARCHAR2,
+    p_article_prix OUT NUMBER,
+    p_article_photo OUT VARCHAR2,
+    p_article_note OUT NUMBER,
+    p_article_date_creation OUT DATE,
+    p_article_date_suppression OUT DATE
+) AS
+BEGIN
+    SELECT ARTICLE_ID, ARTICLE_NOM, ARTICLE_DESCRIPTION, ARTICLE_PRIX, ARTICLE_PHOTO, ARTICLE_NOTE, ARTICLE_DATE_CREATION, ARTICLE_DATE_SUPPRESSION
+    INTO p_article_id, p_article_nom, p_article_description, p_article_prix, p_article_photo, p_article_note, p_article_date_creation, p_article_date_suppression
+    FROM ARTICLE
+    WHERE ARTICLE_UID = p_article_uid;
+END get_article_info;
+/
+
+CREATE OR REPLACE PROCEDURE insert_souhait (
+    p_souhait_id IN VARCHAR2,
+    p_souhait_uid IN VARCHAR2,
+    p_utilisateur_uid IN VARCHAR2,
+    p_date_ajout IN DATE,
+    p_date_suppression IN DATE,
+    p_commande_uid IN VARCHAR2,
+    p_article_uid IN VARCHAR2,
+    p_quantite IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO SOUHAITS (SOUHAITS_ID, SOUHAITS_UID, SOUHAITS_UTILISATEUR_UID, SOUHAITS_DATE_AJOUT, SOUHAITS_DATE_SUPPRESSION, SOUHAITS_COMMANDE_UID, SOUHAITS_ARTICLE_UID, SOUHAITS_QUANTITÉ)
+    VALUES (p_souhait_id, p_souhait_uid, p_utilisateur_uid, p_date_ajout, p_date_suppression, p_commande_uid, p_article_uid, p_quantite);
+END insert_souhait;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_souhait (
+    p_souhait_uid IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM SOUHAITS
+    WHERE SOUHAITS_UID = p_souhait_uid;
+END delete_souhait;
+/
+
+--UPDATE
+CREATE OR REPLACE PROCEDURE update_souhait (
+    p_souhait_uid IN VARCHAR2,
+    p_souhait_id IN VARCHAR2,
+    p_utilisateur_uid IN VARCHAR2,
+    p_date_ajout IN DATE,
+    p_date_suppression IN DATE,
+    p_commande_uid IN VARCHAR2,
+    p_article_uid IN VARCHAR2,
+    p_quantite IN VARCHAR2
+) AS
+BEGIN
+    UPDATE SOUHAITS
+    SET SOUHAITS_ID = p_souhait_id,
+        SOUHAITS_UTILISATEUR_UID = p_utilisateur_uid,
+        SOUHAITS_DATE_AJOUT = p_date_ajout,
+        SOUHAITS_DATE_SUPPRESSION = p_date_suppression,
+        SOUHAITS_COMMANDE_UID = p_commande_uid,
+        SOUHAITS_ARTICLE_UID = p_article_uid,
+        SOUHAITS_QUANTITÉ = p_quantite
+    WHERE SOUHAITS_UID = p_souhait_uid;
+END update_souhait;
+/
+
+-- GET
+CREATE OR REPLACE PROCEDURE get_souhait_info (
+    p_souhait_uid IN VARCHAR2,
+    p_souhait_id OUT VARCHAR2,
+    p_utilisateur_uid OUT VARCHAR2,
+    p_date_ajout OUT DATE,
+    p_date_suppression OUT DATE,
+    p_commande_uid OUT VARCHAR2,
+    p_article_uid OUT VARCHAR2,
+    p_quantite OUT VARCHAR2
+) AS
+BEGIN
+    SELECT SOUHAITS_ID, SOUHAITS_UTILISATEUR_UID, SOUHAITS_DATE_AJOUT, SOUHAITS_DATE_SUPPRESSION, SOUHAITS_COMMANDE_UID, SOUHAITS_ARTICLE_UID, SOUHAITS_QUANTITÉ
+    INTO p_souhait_id, p_utilisateur_uid, p_date_ajout, p_date_suppression, p_commande_uid, p_article_uid, p_quantite
+    FROM SOUHAITS
+    WHERE SOUHAITS_UID = p_souhait_uid;
+END get_souhait_info;
+/
+
+
+-- Accesseurs Historique_Adresse
+
+-- INSERT
+CREATE OR REPLACE PROCEDURE insert_historique_adresse (
+    p_historique_adresse_uid IN VARCHAR2,
+    p_id IN NUMBER,
+    p_adresse_initial_uid IN VARCHAR2,
+    p_adresse_uid IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO HISTORIQUE_ADRESSE (HISTORIQUE_ADRESSE_UID, ID, ADRESSE_INITIAL_UID, ADRESSE_UID)
+    VALUES (p_historique_adresse_uid, p_id, p_adresse_initial_uid, p_adresse_uid);
+END insert_historique_adresse;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_historique_adresse (
+    p_historique_adresse_uid IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM HISTORIQUE_ADRESSE
+    WHERE HISTORIQUE_ADRESSE_UID = p_historique_adresse_uid;
+END delete_historique_adresse;
+/
+
+-- UPDATE
+CREATE OR REPLACE PROCEDURE update_historique_adresse (
+    p_historique_adresse_uid IN VARCHAR2,
+    p_id IN NUMBER,
+    p_adresse_initial_uid IN VARCHAR2,
+    p_adresse_uid IN VARCHAR2
+) AS
+BEGIN
+    UPDATE HISTORIQUE_ADRESSE
+    SET ID = p_id,
+        ADRESSE_INITIAL_UID = p_adresse_initial_uid,
+        ADRESSE_UID = p_adresse_uid
+    WHERE HISTORIQUE_ADRESSE_UID = p_historique_adresse_uid;
+END update_historique_adresse;
+/
+
+-- GET
+CREATE OR REPLACE PROCEDURE get_historique_adresse_info (
+    p_historique_adresse_uid IN VARCHAR2,
+    p_id OUT NUMBER,
+    p_adresse_initial_uid OUT VARCHAR2,
+    p_adresse_uid OUT VARCHAR2
+) AS
+BEGIN
+    SELECT ID, ADRESSE_INITIAL_UID, ADRESSE_UID
+    INTO p_id, p_adresse_initial_uid, p_adresse_uid
+    FROM HISTORIQUE_ADRESSE
+    WHERE HISTORIQUE_ADRESSE_UID = p_historique_adresse_uid;
+END get_historique_adresse_info;
+/
+
+-- Accesseurs Commande_Article
+
+-- INSERT
+CREATE OR REPLACE PROCEDURE insert_commande_article (
+    p_commande_article_uid IN VARCHAR2,
+    p_commande_article_id IN VARCHAR2,
+    p_commande_uid IN VARCHAR2,
+    p_quantite IN NUMBER,
+    p_article_uid IN VARCHAR2
+) AS
+BEGIN
+    INSERT INTO COMMANDE_ARTICLE (COMMANDE_ARTICLE_UID, COMMANDE_ARTICLE_ID, COMMANDE_UID, QUANTITÉ, COMMANDE_ARTICLE_ARTICLE_UID)
+    VALUES (p_commande_article_uid, p_commande_article_id, p_commande_uid, p_quantite, p_article_uid);
+END insert_commande_article;
+/
+
+-- DELETE
+CREATE OR REPLACE PROCEDURE delete_commande_article (
+    p_commande_article_uid IN VARCHAR2
+) AS
+BEGIN
+    DELETE FROM COMMANDE_ARTICLE
+    WHERE COMMANDE_ARTICLE_UID = p_commande_article_uid;
+END delete_commande_article;
+/
+
+-- UPDATE
+CREATE OR REPLACE PROCEDURE update_commande_article (
+    p_commande_article_uid IN VARCHAR2,
+    p_commande_article_id IN VARCHAR2,
+    p_commande_uid IN VARCHAR2,
+    p_quantite IN NUMBER,
+    p_article_uid IN VARCHAR2
+) AS
+BEGIN
+    UPDATE COMMANDE_ARTICLE
+    SET COMMANDE_ARTICLE_ID = p_commande_article_id,
+        COMMANDE_UID = p_commande_uid,
+        QUANTITÉ = p_quantite,
+        COMMANDE_ARTICLE_ARTICLE_UID = p_article_uid
+    WHERE COMMANDE_ARTICLE_UID = p_commande_article_uid;
+END update_commande_article;
+/
+
+-- GET
+CREATE OR REPLACE PROCEDURE update_commande_article (
+    p_commande_article_uid IN VARCHAR2,
+    p_commande_article_id IN VARCHAR2,
+    p_commande_uid IN VARCHAR2,
+    p_quantite IN NUMBER,
+    p_article_uid IN VARCHAR2
+) AS
+BEGIN
+    UPDATE COMMANDE_ARTICLE
+    SET COMMANDE_ARTICLE_ID = p_commande_article_id,
+        COMMANDE_UID = p_commande_uid,
+        QUANTITÉ = p_quantite,
+        COMMANDE_ARTICLE_ARTICLE_UID = p_article_uid
+    WHERE COMMANDE_ARTICLE_UID = p_commande_article_uid;
+END update_commande_article;
+/
+
+-- VIEWS
+
+-- Vue Statistique articles souhaités mais non commandés
+CREATE VIEW STATS_ARTICLES_SOUHAITES_SANS_COMMANDE AS
+SELECT
+    SA.SOUHAITS_ARTICLE_UID AS ARTICLE_UID,
+    A.ARTICLE_NOM,
+    A.ARTICLE_DESCRIPTION,
+    COUNT(SA.SOUHAITS_UID) AS NOMBRE_DE_SOUHAITS
+FROM
+    SOUHAITS SA
+        JOIN
+    ARTICLE A ON SA.SOUHAITS_ARTICLE_UID = A.ARTICLE_UID
+WHERE
+    SA.SOUHAITS_COMMANDE_UID IS NULL
+GROUP BY
+    SA.SOUHAITS_ARTICLE_UID, A.ARTICLE_NOM, A.ARTICLE_DESCRIPTION;
+
+-- Vue Statistique catégories les plus commandées
+CREATE VIEW STATS_CATEGORIES_COMMANDEES AS
+SELECT
+    AC.ARTICLE_CATEGORIE_CATEGORIE_UID AS CATEGORIE_UID,
+    C.CATEGORIE_NOM,
+    COUNT(*) AS NOMBRE_DE_COMMANDES
+FROM
+    COMMANDE_ARTICLE CA
+        JOIN
+    ARTICLE_CATEGORIE AC ON CA.COMMANDE_ARTICLE_ARTICLE_UID = AC.ARTICLE_CATEGORIE_ARTICLE_UID
+        JOIN
+    CATEGORIE C ON AC.ARTICLE_CATEGORIE_CATEGORIE_UID = C.CATEGORIE_UID
+GROUP BY
+    AC.ARTICLE_CATEGORIE_CATEGORIE_UID, C.CATEGORIE_NOM;
+
+
+-- Journaux de Log
+
+-- Log des Adresses
+CREATE SEQUENCE  "AMAZONDATABASE"."ADRESSE_LOG_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 2 NOCACHE  NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
+
+create or replace NONEDITIONABLE TRIGGER adresse_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON ADRESSE
+    FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        INSERT INTO ADRESSE_LOG (LOG_ID, ADRESSE_ID, ACTION, TIMESTAMP)
+        VALUES (adresse_log_seq.NEXTVAL, :NEW.ADRESSE_ID, 'INSERT', SYSTIMESTAMP);
+    ELSIF UPDATING THEN
+        INSERT INTO ADRESSE_LOG (LOG_ID, ADRESSE_ID, ACTION, TIMESTAMP)
+        VALUES (adresse_log_seq.NEXTVAL, :NEW.ADRESSE_ID, 'UPDATE', SYSTIMESTAMP);
+    ELSIF DELETING THEN
+        INSERT INTO ADRESSE_LOG (LOG_ID, ADRESSE_ID, ACTION, TIMESTAMP)
+        VALUES (adresse_log_seq.NEXTVAL, :NEW.ADRESSE_ID, 'DELETE', SYSTIMESTAMP);
+    END IF;
+END;
+/
+-- Log des Souhaits
+CREATE SEQUENCE  "AMAZONDATABASE"."SOUHAIT_LOG_SEQ"  MINVALUE 1 MAXVALUE 9999999999999999999999999999 INCREMENT BY 1 START WITH 21 CACHE 20 NOORDER  NOCYCLE  NOKEEP  NOSCALE  GLOBAL ;
+
+create or replace NONEDITIONABLE TRIGGER souhait_trigger
+    AFTER INSERT OR UPDATE OR DELETE ON SOUHAITS
+    FOR EACH ROW
+BEGIN
+    IF INSERTING THEN
+        INSERT INTO SOUHAITS_LOG (LOG_ID, SOUHAITS_ID, ACTION, TIMESTAMP)
+        VALUES (souhait_log_seq.NEXTVAL, :NEW.SOUHAITS_ID, 'INSERT', SYSTIMESTAMP);
+    ELSIF UPDATING THEN
+        INSERT INTO SOUHAITS_LOG (LOG_ID, SOUHAITS_ID, ACTION, TIMESTAMP)
+        VALUES (souhait_log_seq.NEXTVAL, :NEW.SOUHAITS_ID, 'UPDATE', SYSTIMESTAMP);
+    ELSIF DELETING THEN
+        INSERT INTO SOUHAITS_LOG (LOG_ID, SOUHAITS_ID, ACTION, TIMESTAMP)
+        VALUES (souhait_log_seq.NEXTVAL, :OLD.SOUHAITS_ID, 'DELETE', SYSTIMESTAMP);
+    END IF;
+END;
+/
 
 -- Création d'un jeu de donnée de test
 -- Insertion des utilisateurs
@@ -634,39 +1105,37 @@ BEGIN
 END;
 /
 
--- Test des getters
--- Test du getter pour UTILISATEUR avec l'ID 1
-DECLARE
-    utilisateur_cursor SYS_REFCURSOR;
-    v_utilisateur_uid VARCHAR2(255);
-    v_utilisateur_id NUMBER;
-    v_nom VARCHAR2(200);
-    v_prenom VARCHAR2(200);
-    v_email VARCHAR2(255);
-    v_est_vendeur NUMBER;
-    v_date_creation DATE;
-    v_date_suppression DATE;
+-- Insertion des articles
 BEGIN
-    get_utilisateur('1', utilisateur_cursor);
-    FETCH utilisateur_cursor INTO
-        v_utilisateur_uid,
-        v_utilisateur_id,
-        v_nom,
-        v_prenom,
-        v_email,
-        v_est_vendeur,
-        v_date_creation,
-        v_date_suppression;
-    DBMS_OUTPUT.PUT_LINE('Résultats pour l''utilisateur avec l''ID 1:');
-    DBMS_OUTPUT.PUT_LINE('-----------------------------------------');
-    DBMS_OUTPUT.PUT_LINE('Utilisateur UID: ' || v_utilisateur_uid);
-    DBMS_OUTPUT.PUT_LINE('Utilisateur ID: ' || v_utilisateur_id);
-    DBMS_OUTPUT.PUT_LINE('Nom: ' || v_nom);
-    DBMS_OUTPUT.PUT_LINE('Prénom: ' || v_prenom);
-    DBMS_OUTPUT.PUT_LINE('Email: ' || v_email);
-    DBMS_OUTPUT.PUT_LINE('Est Vendeur: ' || v_est_vendeur);
-    DBMS_OUTPUT.PUT_LINE('Date de création: ' || TO_CHAR(v_date_creation, 'YYYY-MM-DD'));
-    DBMS_OUTPUT.PUT_LINE('Date de suppression: ' || NVL(TO_CHAR(v_date_suppression, 'YYYY-MM-DD'), 'N/A'));
-    DBMS_OUTPUT.PUT_LINE('-----------------------------------------');
-    CLOSE utilisateur_cursor;
+    insert_article('1', '1', 'Article 1', 'Description de l''article 1', 100, 'photo1.jpg', 4, SYSDATE, NULL);
+    insert_article('2', '2', 'Article 2', 'Description de l''article 2', 200, 'photo2.jpg', 3, SYSDATE, NULL);
+    insert_article('3', '3', 'Article 3', 'Description de l''article 3', 300, 'photo3.jpg', 5, SYSDATE, NULL);
 END;
+/
+-- Insertion des commandes_articles
+BEGIN
+    insert_commande_article('1', '1', '1', 1, '1');
+    insert_commande_article('2', '2', '2', 2, '2');
+    insert_commande_article('3', '3', '3', 3, '3');
+END;
+
+-- Insertion des souhaits
+BEGIN
+    insert_souhait('1', '1', '1', SYSDATE, NULL, '1', '1', '1');
+    insert_souhait('2', '2', '2', SYSDATE, NULL, '2', '2', '2');
+    insert_souhait('3', '3', '3', SYSDATE, NULL, '3', '3', '3');
+END;
+/
+-- Insertion des catégories
+BEGIN
+    insert_categorie('1', '1', 'Catégorie 1', 'Description de la catégorie 1');
+    insert_categorie('2', '2', 'Catégorie 2', 'Description de la catégorie 2');
+    insert_categorie('3', '3', 'Catégorie 3', 'Description de la catégorie 3');
+    insert_categorie('4', '4', 'Catégorie 4', 'Description de la catégorie 4');
+    COMMIT;
+    DBMS_OUTPUT.PUT_LINE('Jeu de données pour les catégories inséré avec succès.');
+EXCEPTION
+    WHEN OTHERS THEN
+        DBMS_OUTPUT.PUT_LINE('Erreur lors de l''insertion des données pour les catégories: ' || SQLERRM);
+END;
+/
